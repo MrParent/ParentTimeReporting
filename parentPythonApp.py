@@ -6,27 +6,50 @@ from base64 import b64encode
 import requests
 import sys
 import os
+import re
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
 
-# Function to handle the selection
-def select_strings():
-    checked_strings = []
+# Check if a string is a valid Jira issue description
+def is_valid_description(description):
+    # The regex pattern
+    pattern = r'^[A-Z]+-\d+$'
+    
+    # Use the match function to check if the description matches the pattern
+    match = re.match(pattern, description)
+    
+    # If the match function returns a match object, the description is valid
+    return match is not None
+
+# Function to push the selected items to Jira worklog
+def push_selected_items():
+    checked_items = []
     for index in range(listbox.count()):
         item = listbox.item(index)
         if item.checkState() == Qt.Checked:
-            checked_strings.append(item.text())
-    print("Checked strings:", checked_strings)
+            checked_items.append(item)
+    
+    timeEntries_to_push = []
+
+    for item in checked_items:
+        timeEntry = item.data(Qt.UserRole)
+        #print(timeEntry.description)
+        if is_valid_description(timeEntry.description):
+            #print("Valid Jira issue description")
+            print(str(timeEntry.duration) + ":" + str(timeEntry.description))
+            timeEntries_to_push.append(timeEntry)
+
 
 # Function to add items to a QListWidget as checkboxes
 def add_items_as_checkboxes(listbox, timeEntries):
     listbox.clear()
     for entry in timeEntries:
-        item = QListWidgetItem(entry.__str__())
+        item = QListWidgetItem(str(entry))
         item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
         item.setCheckState(Qt.CheckState.Checked)
         item.setFont(monospace_font)
+        item.setData(Qt.UserRole, entry)
         listbox.addItem(item)
 
 # Function to get the Toggl entries
@@ -120,14 +143,14 @@ listbox.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 # Create a button to trigger the selection
 jira_button = QPushButton("Push to Jira")
 jira_button.setFixedSize(200, 30)
-jira_button.clicked.connect(select_strings)
+jira_button.clicked.connect(push_selected_items)
 
 hbox3 = QHBoxLayout()
 
 # Create a button to trigger the selection
 maconomy_button = QPushButton("Push to Maconomy")
 maconomy_button.setFixedSize(200, 30)
-maconomy_button.clicked.connect(select_strings)
+maconomy_button.clicked.connect(push_selected_items)
 
 # Create a layout and add the QListWidget and button to it
 layout.addWidget(listbox)
