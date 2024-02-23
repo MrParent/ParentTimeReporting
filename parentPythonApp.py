@@ -1,29 +1,15 @@
 from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidgetItem, QLabel
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QFont
-from toggl import TimeEntry
-from base64 import b64encode
-import requests
+import timeLog
+import requester
 import sys
-import os
-import re
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
 
-# Check if a string is a valid Jira issue description
-def is_valid_description(description):
-    # The regex pattern
-    pattern = r'^[A-Z]+-\d+$'
-    
-    # Use the match function to check if the description matches the pattern
-    match = re.match(pattern, description)
-    
-    # If the match function returns a match object, the description is valid
-    return match is not None
-
 # Function to push the selected items to Jira worklog
-def push_selected_items():
+def push_selected_items_jira():
     checked_items = []
     for index in range(listbox.count()):
         item = listbox.item(index)
@@ -34,16 +20,15 @@ def push_selected_items():
 
     for item in checked_items:
         timeEntry = item.data(Qt.UserRole)
-        #print(timeEntry.description)
-        if is_valid_description(timeEntry.description):
-            #print("Valid Jira issue description")
-            print(str(timeEntry.duration) + ":" + str(timeEntry.description))
+        if timeLog.is_valid_description(timeEntry.description):
+            print(str(timeEntry.get_duration_minutes()) + ":" + str(timeEntry.description))
             timeEntries_to_push.append(timeEntry)
 
 
 # Function to add items to a QListWidget as checkboxes
 def add_items_as_checkboxes(listbox, timeEntries):
     listbox.clear()
+    
     for entry in timeEntries:
         item = QListWidgetItem(str(entry))
         item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
@@ -54,24 +39,7 @@ def add_items_as_checkboxes(listbox, timeEntries):
 
 # Function to get the Toggl entries
 def get_toggl_entries():
-    #get the api key from the environment variable
-    toggl_api_key = os.getenv('TOGGL_API_KEY') 
-    startTime = start_date_edit.dateTime().toString("yyyy-MM-ddT00:00:00+00:00")
-    endTime = end_date_edit.dateTime().toString("yyyy-MM-ddT23:59:00+00:00")
-    auth_string = b64encode(f"{toggl_api_key}:api_token".encode()).decode()
-
-    headers = {
-        'content-type': 'application/json',
-        'Authorization' : f'Basic {auth_string}'
-    }
-
-    params = {
-        'meta' : 'true',
-        'start_date': startTime,
-        'end_date': endTime
-    }
-
-    response = requests.get('https://api.track.toggl.com/api/v9/me/time_entries', headers=headers, params=params).json()
+    response = requester.make_toggl_request(start_date_edit.dateTime(), end_date_edit.dateTime())
     timeEntries = []
     
     for entry in response:
@@ -82,8 +50,9 @@ def get_toggl_entries():
         description = entry.get('description', "None")
         client_name = entry.get('client_name', "None")
         project_name = entry.get('project_name', "None")
-        timeEntry = TimeEntry(start, stop, duration, description, client_name, project_name)
+        timeEntry = timeLog.TimeLog(start, stop, duration, description, client_name, project_name)
         timeEntries.append(timeEntry)
+    
     add_items_as_checkboxes(listbox, timeEntries)
 
 # Create the main application
@@ -143,14 +112,14 @@ listbox.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 # Create a button to trigger the selection
 jira_button = QPushButton("Push to Jira")
 jira_button.setFixedSize(200, 30)
-jira_button.clicked.connect(push_selected_items)
+jira_button.clicked.connect(push_selected_items_jira)
 
 hbox3 = QHBoxLayout()
 
 # Create a button to trigger the selection
 maconomy_button = QPushButton("Push to Maconomy")
 maconomy_button.setFixedSize(200, 30)
-maconomy_button.clicked.connect(push_selected_items)
+#maconomy_button.clicked.connect(push_selected_items_maconomy)
 
 # Create a layout and add the QListWidget and button to it
 layout.addWidget(listbox)
