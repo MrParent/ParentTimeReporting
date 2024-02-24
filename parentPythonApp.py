@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidgetItem, QLabel
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QFont
+from popup import PopupWindow
 import timeLog
 import requester
 import sys
@@ -21,9 +22,13 @@ def push_selected_items_jira():
     for item in checked_items:
         timeEntry = item.data(Qt.UserRole)
         if timeLog.is_valid_description(timeEntry.description):
-            print(str(timeEntry.get_duration_minutes()) + ":" + str(timeEntry.description))
             timeEntries_to_push.append(timeEntry)
 
+    #formatted_time = timeLog.format_time('2024-02-24T13:30:00+00:00', 1)
+    #response = requester.make_jira_request('NOBIA-7036', '30m', formatted_time)
+    #print(response.text)
+    popupWindow = PopupWindow(timeEntries_to_push)
+    popupWindow.exec_()
 
 # Function to add items to a QListWidget as checkboxes
 def add_items_as_checkboxes(listbox, timeEntries):
