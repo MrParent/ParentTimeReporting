@@ -44,9 +44,10 @@ class PopupWindow(QDialog):
             item = self.listbox.item(index)
             if item.checkState() == Qt.Checked:
                 entry = item.data(Qt.UserRole)
-                if entry.description and entry.get_duration_minutes() and entry.start:
-                    response = requester.make_jira_request(entry.description, entry.get_duration_minutes(), entry.start)
-                    print(entry.short_str() + " is Valid. Trying to update... Response: " + response.text)
+                if entry.description and entry.get_jira_duration() and entry.get_jira_start_time():
+                    print(entry.short_str() + " is Valid. Trying to update Jira ticket worklog...")
+                    response = requester.make_jira_request(entry.description, entry.get_jira_duration(), entry.get_jira_start_time())
+                    print("Done. Response: " + response.text)
                 else:
                     print("Entry is not valid: " + entry.short_str())
         print("Push to Jira finished")

@@ -17,12 +17,19 @@ class TimeLog :
         return f"{self.get_duration():<8} {self.description:<15} {self.start.split('T')[0]:<8}"
 
     def get_duration(self):
-        hours, minutes, seconds = convert_seconds(int(self.duration))
+        hours, minutes, seconds = convert_seconds(self.duration)
         return f"{hours:02}:{minutes:02}"
     
     def get_duration_minutes(self):
         minutes = convert_to_minutes(self.duration)
         return str(minutes)
+    
+    def get_jira_start_time(self):
+        return format_time(self.start, 1)
+    
+    def get_jira_duration(self):
+        hours, minutes, seconds = convert_seconds(self.duration)
+        return f"{hours}h {minutes}m"
 
 # Check if a string is a valid Jira issue description
 def is_valid_description(description):

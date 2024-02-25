@@ -24,9 +24,6 @@ def push_selected_items_jira():
         if timeLog.is_valid_description(timeEntry.description):
             timeEntries_to_push.append(timeEntry)
 
-    #formatted_time = timeLog.format_time('2024-02-24T13:30:00+00:00', 1)
-    #response = requester.make_jira_request('NOBIA-7036', '30m', formatted_time)
-    #print(response.text)
     popupWindow = PopupWindow(timeEntries_to_push)
     popupWindow.exec_()
 
