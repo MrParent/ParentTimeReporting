@@ -42,6 +42,13 @@ def is_valid_description(description):
     # If the match function returns a match object, the description is valid
     return match is not None
 
+# Check if a TimeLog entry is valid for Maconomy. FIXME: Check against mapping for valid Maconomy entries
+def is_valid_maconomy_entry(entry):
+    if(entry.desciption and entry.duration and entry.start and entry.project_name and entry.client_name):
+        return True
+    else:
+        return False
+
 def convert_seconds(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)

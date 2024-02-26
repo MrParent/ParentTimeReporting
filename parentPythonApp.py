@@ -27,6 +27,31 @@ def push_selected_items_jira():
     popupWindow = PopupWindow(timeEntries_to_push)
     popupWindow.exec_()
 
+    # FIXME: log the result of the push to jira in a file
+    # if no api key is found, show default login fields. 
+
+# Function to push the selected items to Maconomy
+def push_selected_items_maconomy():
+    checked_items = []
+    for index in range(listbox.count()):
+        item = listbox.item(index)
+        if item.checkState() == Qt.Checked:
+            checked_items.append(item)
+    
+    timeEntries_to_push = []
+
+    for item in checked_items:
+        timeEntry = item.data(Qt.UserRole)
+        if timeLog.is_valid_maconomy_entry(timeEntry):
+            timeEntries_to_push.append(timeEntry)
+
+    # FIXME: if no api key is found, show default login fields. 
+    # merge time entries of the same day, client, project and description
+    # present the merged time entries to the user in a popup dialog
+    # in the dialog, being able to push to Maconomy or abort. Still checkable items.
+    # log the result of the push to Maconomy in the console
+    # log the result of the push to Maconomy in a file
+    
 # Function to add items to a QListWidget as checkboxes
 def add_items_as_checkboxes(listbox, timeEntries):
     listbox.clear()
@@ -56,6 +81,9 @@ def get_toggl_entries():
         timeEntries.append(timeEntry)
     
     add_items_as_checkboxes(listbox, timeEntries)
+
+    #FIXME: if no api key is found, show default login fields.
+    # log the result of the get toggl entries in a file 
 
 # Create the main application
 app = QApplication([])
@@ -121,7 +149,7 @@ hbox3 = QHBoxLayout()
 # Create a button to trigger the selection
 maconomy_button = QPushButton("Push to Maconomy")
 maconomy_button.setFixedSize(200, 30)
-#maconomy_button.clicked.connect(push_selected_items_maconomy)
+maconomy_button.clicked.connect(push_selected_items_maconomy)
 
 # Create a layout and add the QListWidget and button to it
 layout.addWidget(listbox)
