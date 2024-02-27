@@ -2,6 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from base64 import b64encode
 import os
+from logger_config import logger
 
 def make_toggl_request(startTime, endTime):
     #get the api key from the environment variable
@@ -22,6 +23,8 @@ def make_toggl_request(startTime, endTime):
     }
 
     response = requests.get('https://api.track.toggl.com/api/v9/me/time_entries', headers=headers, params=params).json()
+    logger.info("Toggl Response = ")
+    logger.info(response)
     return response
 
 def make_jira_request(ticket, duration, startTime):
@@ -46,5 +49,6 @@ def make_jira_request(ticket, duration, startTime):
     }
 
     response = requests.post(url, headers=headers, json=body, params=params, auth=auth)
-
+    logger.info("Jira Response = ")
+    logger.info(response)
     return response

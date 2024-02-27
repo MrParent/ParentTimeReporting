@@ -2,3 +2,5 @@ __pycache__/toggl.cpython-311.pyc
 __pycache__/requester.cpython-311.pyc
 __pycache__/timeLog.cpython-311.pyc
 __pycache__/popup.cpython-311.pyc
+__pycache__/logger_config.cpython-311.pyc
+global.log
