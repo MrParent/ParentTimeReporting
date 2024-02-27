@@ -24,7 +24,7 @@ def push_selected_items_jira():
         if timeLog.is_valid_description(timeEntry.description):
             timeEntries_to_push.append(timeEntry)
 
-    popupWindow = PopupWindow(timeEntries_to_push)
+    popupWindow = PopupWindow(timeEntries_to_push, "Jira")
     popupWindow.exec_()
 
     #FIXME: if no api key is found, show default login fields.
@@ -44,6 +44,10 @@ def push_selected_items_maconomy():
         if timeLog.is_valid_maconomy_entry(timeEntry):
             timeEntries_to_push.append(timeEntry)
 
+    timeEntries_to_push = timeLog.merge_time_logs(timeEntries_to_push)
+    popupWindow = PopupWindow(timeEntries_to_push, "Maconomy")
+    popupWindow.exec_()
+
     # FIXME: if no api key is found, show default login fields. 
     # merge time entries of the same day, client, project and description
     # present the merged time entries to the user in a popup dialog
@@ -55,7 +59,16 @@ def push_selected_items_maconomy():
 def add_items_as_checkboxes(listbox, timeEntries):
     listbox.clear()
     
+    last_date = None
     for entry in timeEntries:
+        # If the start date of the entry is different from the last date, add a date item
+        if entry.get_start_date() != last_date:
+            last_date = entry.get_start_date()
+            date_item = QListWidgetItem(last_date)
+            date_item.setFlags(Qt.NoItemFlags)  # Make the item non-selectable and non-checkable
+            date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
+            listbox.addItem(date_item)
+        
         item = QListWidgetItem(str(entry))
         item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
         item.setCheckState(Qt.CheckState.Checked)
@@ -137,14 +150,14 @@ listbox.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 #listbox.setWordWrap(True)
 
 # Create a button to trigger the selection
-jira_button = QPushButton("Push to Jira")
+jira_button = QPushButton("Push to Jira worklogs")
 jira_button.setFixedSize(200, 30)
 jira_button.clicked.connect(push_selected_items_jira)
 
 hbox3 = QHBoxLayout()
 
 # Create a button to trigger the selection
-maconomy_button = QPushButton("Push to Maconomy")
+maconomy_button = QPushButton("Push to Maconomy time sheet")
 maconomy_button.setFixedSize(200, 30)
 maconomy_button.clicked.connect(push_selected_items_maconomy)
 
@@ -161,8 +174,8 @@ layout.addLayout(hbox3)
 window.setLayout(layout)
 
 # Set the window title and geometry
-window.setWindowTitle("Toggl Time Entries")
-window.setGeometry(100, 100, 1500, 600)
+window.setWindowTitle("Time log pusher")
+window.setGeometry(100, 100, 1400, 600)
 
 # Show the window
 window.show()

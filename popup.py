@@ -7,16 +7,25 @@ import requester
 monospace_font = QFont("Courier")
 
 class PopupWindow(QDialog):
-    def __init__(self, entries, parent=None):
+    def __init__(self, entries, whoToPushTo, parent=None):
         super(PopupWindow, self).__init__(parent)
 
-        self.setWindowTitle("Push to Jira worklogs")
-
+        self.setWindowTitle("Push to Jira worklogs" if whoToPushTo == "Jira" else "Push to Maconomy time sheet")
+        
         self.layout = QVBoxLayout()
-
         self.listbox = QListWidget()
+        last_date = None
         for entry in entries:
-            item = QListWidgetItem(entry.short_str())
+        # If the start date of the entry is different from the last date, add a date item
+            if entry.get_start_date() != last_date:
+                last_date = entry.get_start_date()
+                date_item = QListWidgetItem(last_date)
+                date_item.setFlags(Qt.NoItemFlags)  # Make the item non-selectable and non-checkable
+                date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
+                self.listbox.addItem(date_item)
+
+            entryText = entry.__str__() if whoToPushTo == "Maconomy" else entry.short_str()
+            item = QListWidgetItem(entryText)
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.CheckState.Checked)
             item.setFont(monospace_font)
@@ -24,8 +33,11 @@ class PopupWindow(QDialog):
             self.listbox.addItem(item)
 
         self.confirm_button = QPushButton("Confirm")
-        self.confirm_button.clicked.connect(self.on_confirm)
-
+        if whoToPushTo == "Jira":
+            self.confirm_button.clicked.connect(self.on_confirm_jira)
+        else:
+            self.confirm_button.clicked.connect(self.on_confirm_maconomy)
+        
         self.abort_button = QPushButton("Abort")
         self.abort_button.clicked.connect(self.on_abort)
 
@@ -33,11 +45,15 @@ class PopupWindow(QDialog):
         self.layout.addWidget(self.confirm_button)
         self.layout.addWidget(self.abort_button)
 
-        self.setGeometry(800, 300, 400, 300)
+        if whoToPushTo == "Jira":
+            self.setGeometry(800, 300, 400, 300)
+        else:
+            self.setGeometry(100, 100, 1400, 600)
 
         self.setLayout(self.layout)
 
-    def on_confirm(self):
+    # FIXME: Add progress functionality
+    def on_confirm_jira(self):
         print("Push to Jira started")
         # Handle confirm action here
         for index in range(self.listbox.count()):
@@ -51,6 +67,12 @@ class PopupWindow(QDialog):
                 else:
                     print("Entry is not valid: " + entry.short_str())
         print("Push to Jira finished")
+        self.close()
+
+    def on_confirm_maconomy(self):
+        print("Push to Maconomy started")
+        # Handle confirm action here
+        print("Push to Maconomy finished")
         self.close()
 
     def on_abort(self):
