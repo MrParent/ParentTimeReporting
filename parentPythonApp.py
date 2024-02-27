@@ -27,8 +27,7 @@ def push_selected_items_jira():
     popupWindow = PopupWindow(timeEntries_to_push)
     popupWindow.exec_()
 
-    # FIXME: log the result of the push to jira in a file
-    # if no api key is found, show default login fields. 
+    #FIXME: if no api key is found, show default login fields.
 
 # Function to push the selected items to Maconomy
 def push_selected_items_maconomy():
@@ -81,9 +80,7 @@ def get_toggl_entries():
         timeEntries.append(timeEntry)
     
     add_items_as_checkboxes(listbox, timeEntries)
-
     #FIXME: if no api key is found, show default login fields.
-    # log the result of the get toggl entries in a file 
 
 # Create the main application
 app = QApplication([])
