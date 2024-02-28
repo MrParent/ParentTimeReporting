@@ -20,6 +20,9 @@ class TimeLog :
         hours, minutes, seconds = convert_seconds(self.duration)
         return f"{hours:02}:{minutes:02}"
     
+    def get_duration_hours(self):
+        return self.duration / 3600
+    
     def get_duration_minutes(self):
         minutes = convert_to_minutes(self.duration)
         return str(minutes)
@@ -47,7 +50,7 @@ def is_valid_description(description):
 
 # Check if a TimeLog entry is valid for Maconomy. FIXME: Check against mapping for valid Maconomy entries
 def is_valid_maconomy_entry(entry):
-    if(entry.description and entry.duration and entry.start and entry.project_name and entry.client_name):
+    if(entry.duration and entry.start and entry.project_name and entry.client_name):
         return True
     else:
         return False

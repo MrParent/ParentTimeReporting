@@ -4,3 +4,7 @@ __pycache__/timeLog.cpython-311.pyc
 __pycache__/popup.cpython-311.pyc
 __pycache__/logger_config.cpython-311.pyc
 global.log
+config.json
+__pycache__/maconomy.cpython-311.pyc
+__pycache__/maconomyEntry.cpython-311.pyc
+__pycache__/maconomyRow.cpython-311.pyc

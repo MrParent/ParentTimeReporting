@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
 import requester
+import maconomyRow
 
 monospace_font = QFont("Courier")
 
@@ -24,15 +25,26 @@ class PopupWindow(QDialog):
                 date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
                 self.listbox.addItem(date_item)
 
-            entryText = entry.__str__() if whoToPushTo == "Maconomy" else entry.short_str()
-            item = QListWidgetItem(entryText)
-            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-            item.setCheckState(Qt.CheckState.Checked)
-            item.setFont(monospace_font)
-            item.setData(Qt.UserRole, entry)
-            self.listbox.addItem(item)
+            if whoToPushTo == "Maconomy":
+                maconomyEntry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
+                entryText = maconomyEntry.short_str()
+                item = QListWidgetItem(entryText)
+                item.setData(Qt.UserRole, maconomyEntry)
+                item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                item.setCheckState(Qt.CheckState.Checked)
+                item.setFont(monospace_font)
+                self.listbox.addItem(item)
+            else:
+                entryText = entry.short_str()
+                item = QListWidgetItem(entryText)
+                item.setData(Qt.UserRole, entry)
+                item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                item.setCheckState(Qt.CheckState.Checked)
+                item.setFont(monospace_font)
+                self.listbox.addItem(item)
 
         self.confirm_button = QPushButton("Confirm")
+        
         if whoToPushTo == "Jira":
             self.confirm_button.clicked.connect(self.on_confirm_jira)
         else:
@@ -48,7 +60,7 @@ class PopupWindow(QDialog):
         if whoToPushTo == "Jira":
             self.setGeometry(800, 300, 400, 300)
         else:
-            self.setGeometry(100, 100, 1400, 600)
+            self.setGeometry(100, 100, 1500, 600)
 
         self.setLayout(self.layout)
 
@@ -71,6 +83,11 @@ class PopupWindow(QDialog):
 
     def on_confirm_maconomy(self):
         print("Push to Maconomy started")
+        for index in range(self.listbox.count()):
+            item = self.listbox.item(index)
+            if item.checkState() == Qt.Checked:
+                entry = item.data(Qt.UserRole)
+                print(entry)
         # Handle confirm action here
         print("Push to Maconomy finished")
         self.close()
