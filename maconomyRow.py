@@ -1,5 +1,7 @@
 import json
 
+maconomyCookie = None
+
 class MaconomyRow:
     def __init__(self, jobNr, task, description, date, duration, spec3):
         self.jobNr = jobNr

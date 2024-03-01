@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel, QLineEdit
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
@@ -7,17 +7,17 @@ import maconomyRow
 
 monospace_font = QFont("Courier")
 
-class PopupWindow(QDialog):
-    def __init__(self, entries, whoToPushTo, parent=None):
-        super(PopupWindow, self).__init__(parent)
+class JiraPopupWindow(QDialog):
+    def __init__(self, entries, parent=None):
+        super(JiraPopupWindow, self).__init__(parent)
 
-        self.setWindowTitle("Push to Jira worklogs" if whoToPushTo == "Jira" else "Push to Maconomy time sheet")
+        self.setWindowTitle("Push to Jira worklogs")
         
         self.layout = QVBoxLayout()
         self.listbox = QListWidget()
         last_date = None
         for entry in entries:
-        # If the start date of the entry is different from the last date, add a date item
+            # If the start date of the entry is different from the last date, add a date item
             if entry.get_start_date() != last_date:
                 last_date = entry.get_start_date()
                 date_item = QListWidgetItem(last_date)
@@ -25,30 +25,16 @@ class PopupWindow(QDialog):
                 date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
                 self.listbox.addItem(date_item)
 
-            if whoToPushTo == "Maconomy":
-                maconomyEntry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
-                entryText = maconomyEntry.short_str()
-                item = QListWidgetItem(entryText)
-                item.setData(Qt.UserRole, maconomyEntry)
-                item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-                item.setCheckState(Qt.CheckState.Checked)
-                item.setFont(monospace_font)
-                self.listbox.addItem(item)
-            else:
-                entryText = entry.short_str()
-                item = QListWidgetItem(entryText)
-                item.setData(Qt.UserRole, entry)
-                item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-                item.setCheckState(Qt.CheckState.Checked)
-                item.setFont(monospace_font)
-                self.listbox.addItem(item)
+            entryText = entry.short_str()
+            item = QListWidgetItem(entryText)
+            item.setData(Qt.UserRole, entry)
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            item.setCheckState(Qt.CheckState.Checked)
+            item.setFont(monospace_font)
+            self.listbox.addItem(item)
 
         self.confirm_button = QPushButton("Confirm")
-        
-        if whoToPushTo == "Jira":
-            self.confirm_button.clicked.connect(self.on_confirm_jira)
-        else:
-            self.confirm_button.clicked.connect(self.on_confirm_maconomy)
+        self.confirm_button.clicked.connect(self.on_confirm_jira)
         
         self.abort_button = QPushButton("Abort")
         self.abort_button.clicked.connect(self.on_abort)
@@ -57,11 +43,7 @@ class PopupWindow(QDialog):
         self.layout.addWidget(self.confirm_button)
         self.layout.addWidget(self.abort_button)
 
-        if whoToPushTo == "Jira":
-            self.setGeometry(800, 300, 400, 300)
-        else:
-            self.setGeometry(100, 100, 1500, 600)
-
+        self.setGeometry(800, 300, 400, 300)
         self.setLayout(self.layout)
 
     # FIXME: Add progress functionality
@@ -81,18 +63,116 @@ class PopupWindow(QDialog):
         print("Push to Jira finished")
         self.close()
 
+    def on_abort(self):
+        # Handle abort action here
+        print("Push to Jira aborted")
+        self.close()
+
+
+class MaconomyPopupWindow(QDialog):
+    def __init__(self, entries, parent=None):
+        super(MaconomyPopupWindow, self).__init__(parent)
+
+        self.setWindowTitle("Push to Maconomy time sheet")
+        
+        self.layout = QVBoxLayout()
+        self.listbox = QListWidget()
+        last_date = None
+        for entry in entries:
+            # If the start date of the entry is different from the last date, add a date item
+            if entry.get_start_date() != last_date:
+                last_date = entry.get_start_date()
+                date_item = QListWidgetItem(last_date)
+                date_item.setFlags(Qt.NoItemFlags)  # Make the item non-selectable and non-checkable
+                date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
+                self.listbox.addItem(date_item)
+
+            maconomyEntry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
+            entryText = maconomyEntry.short_str()
+            item = QListWidgetItem(entryText)
+            item.setData(Qt.UserRole, maconomyEntry)
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            item.setCheckState(Qt.CheckState.Checked)
+            item.setFont(monospace_font)
+            self.listbox.addItem(item)
+
+        self.confirm_button = QPushButton("Confirm")
+        self.confirm_button.clicked.connect(self.on_confirm_maconomy)
+        
+        self.abort_button = QPushButton("Abort")
+        self.abort_button.clicked.connect(self.on_abort)
+
+        self.layout.addWidget(self.listbox)
+        self.layout.addWidget(self.confirm_button)
+        self.layout.addWidget(self.abort_button)
+
+        self.setGeometry(100, 100, 1500, 600)
+        self.setLayout(self.layout)
+
     def on_confirm_maconomy(self):
-        print("Push to Maconomy started")
-        for index in range(self.listbox.count()):
-            item = self.listbox.item(index)
-            if item.checkState() == Qt.Checked:
-                entry = item.data(Qt.UserRole)
-                print(entry)
-        # Handle confirm action here
-        print("Push to Maconomy finished")
+        if not maconomyRow.maconomyCookie:
+            MaconomyLoginWindow().exec_()
+        else:
+            print("Push to Maconomy started")
+            for index in range(self.listbox.count()):
+                item = self.listbox.item(index)
+                if item.checkState() == Qt.Checked:
+                    entry = item.data(Qt.UserRole)
+                    print(entry)
+                    
+            # Handle confirm action here
+            print("Push to Maconomy finished")
+            self.close()
+
+    def on_abort(self):
+        # Handle abort action here
+        print("Push to Maconomy aborted")
+        self.close()
+
+
+class MaconomyLoginWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Maconomy Login")
+
+        self.layout = QVBoxLayout()
+
+        self.username_label = QLabel("Username:")
+        self.layout.addWidget(self.username_label)
+
+        self.username_field = QLineEdit()
+        self.layout.addWidget(self.username_field)
+
+        self.password_label = QLabel("Password:")
+        self.layout.addWidget(self.password_label)
+
+        self.password_field = QLineEdit()
+        self.password_field.setEchoMode(QLineEdit.Password)
+        self.layout.addWidget(self.password_field)
+
+        self.layout.addSpacing(10)  # Add spacing between the fields and buttons
+
+        self.confirm_button = QPushButton("Confirm")
+        self.confirm_button.clicked.connect(self.on_confirm_maconomy_login)
+        self.layout.addWidget(self.confirm_button)
+
+        self.abort_button = QPushButton("Abort")
+        self.layout.addWidget(self.abort_button)
+
+        self.setLayout(self.layout)
+
+    def on_confirm_maconomy_login(self):
+        username = self.username_field.text()
+        password = self.password_field.text()
+        response = requester.make_maconomy_login_request(username, password)
+
+        print("Done. Response: " + response.text)
+        maconomyRow.maconomyCookie = response.headers.get('Maconomy-Cookie')
+        print("Maconomy-Cookie: " + str(maconomyRow.maconomyCookie))
         self.close()
 
     def on_abort(self):
         # Handle abort action here
-        print("Push to Jira aborted")
+        print("Login to Maconomy aborted")
         self.close()

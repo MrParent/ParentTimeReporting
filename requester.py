@@ -4,6 +4,7 @@ from base64 import b64encode
 import os
 from logger_config import logger
 
+
 def make_toggl_request(startTime, endTime):
     #get the api key from the environment variable
     toggl_api_key = os.getenv('TOGGL_API_KEY') 
@@ -50,5 +51,22 @@ def make_jira_request(ticket, duration, startTime):
 
     response = requests.post(url, headers=headers, json=body, params=params, auth=auth)
     logger.info("Jira Response = ")
+    logger.info(response)
+    return response
+
+def make_maconomy_login_request(username, password):
+    basicHeader = b64encode(f"{username}:{password}".encode()).decode()
+    url = "https://me96763-webclient.deltekfirst.com/maconomy-api/auth/me96763"
+
+    payload = {}
+    headers = {
+    'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
+    'Maconomy-Client': 'iAccess',
+    'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
+    'Authorization': f'Basic {basicHeader}'
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    logger.info("Maconomy Login Response = ")
     logger.info(response)
     return response

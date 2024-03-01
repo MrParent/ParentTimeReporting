@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidgetItem, QLabel
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QFont
-from popup import PopupWindow
+from popup import JiraPopupWindow, MaconomyPopupWindow
 import timeLog
 import requester
 import sys
@@ -24,7 +24,7 @@ def push_selected_items_jira():
         if timeLog.is_valid_description(timeEntry.description):
             timeEntries_to_push.append(timeEntry)
 
-    popupWindow = PopupWindow(timeEntries_to_push, "Jira")
+    popupWindow = JiraPopupWindow(timeEntries_to_push)
     popupWindow.exec_()
 
     #FIXME: if no api key is found, show default login fields.
@@ -45,7 +45,7 @@ def push_selected_items_maconomy():
             timeEntries_to_push.append(timeEntry)
 
     timeEntries_to_push = timeLog.merge_time_logs(timeEntries_to_push)
-    popupWindow = PopupWindow(timeEntries_to_push, "Maconomy")
+    popupWindow = MaconomyPopupWindow(timeEntries_to_push)
     popupWindow.exec_()
 
     # FIXME: if no api key is found, show default login fields. 
@@ -96,7 +96,7 @@ def get_toggl_entries():
     #FIXME: if no api key is found, show default login fields.
 
 # Create the main application
-app = QApplication([])
+mainApplication = QApplication([])
 
 # Create the main window
 window = QWidget()
@@ -181,4 +181,4 @@ window.setGeometry(100, 100, 1400, 600)
 window.show()
 
 # Start the main loop
-sys.exit(app.exec_())
+sys.exit(mainApplication.exec_())
