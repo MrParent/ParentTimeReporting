@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
 import requester
 import maconomyRow
+from logger_config import logger
 
 monospace_font = QFont("Courier")
 
@@ -114,12 +115,19 @@ class MaconomyPopupWindow(QDialog):
             MaconomyLoginWindow().exec_()
         else:
             print("Push to Maconomy started")
+            updateCard = False
             for index in range(self.listbox.count()):
                 item = self.listbox.item(index)
                 if item.checkState() == Qt.Checked:
                     entry = item.data(Qt.UserRole)
-                    print(entry)
-                    
+                    logger.info(entry)
+                    if not updateCard:
+                        logger.info("Updating card")
+                        response = requester.make_maconomy_request_update_card(entry)
+                        updateCard = True
+                        logger.info(response)
+                    response = requester.make_maconomy_request_insert_row(entry)
+                    logger.info(response)
             # Handle confirm action here
             print("Push to Maconomy finished")
             self.close()
@@ -160,16 +168,27 @@ class MaconomyLoginWindow(QDialog):
         self.abort_button = QPushButton("Abort")
         self.layout.addWidget(self.abort_button)
 
+        self.setGeometry(100, 100, 260, 100)
+
         self.setLayout(self.layout)
 
     def on_confirm_maconomy_login(self):
         username = self.username_field.text()
         password = self.password_field.text()
         response = requester.make_maconomy_login_request(username, password)
-
         print("Done. Response: " + response.text)
         maconomyRow.maconomyCookie = response.headers.get('Maconomy-Cookie')
         print("Maconomy-Cookie: " + str(maconomyRow.maconomyCookie))
+
+        response = requester.make_maconomy_request_get_employee_number()
+        print("Done. Response: " + response.text)
+        
+        response = requester.make_maconomy_request_instance()
+        print("Done. Response: " + response.text)
+
+        response = requester.make_maconomy_request_instance_data()
+        print("Done. Response: " + response.text)
+
         self.close()
 
     def on_abort(self):

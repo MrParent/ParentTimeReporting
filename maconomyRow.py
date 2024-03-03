@@ -1,6 +1,11 @@
 import json
+from datetime import datetime 
 
 maconomyCookie = None
+concurrencyToken = None
+instanceId = None
+cookieJar = None
+employeeNumber = None
 
 class MaconomyRow:
     def __init__(self, jobNr, task, description, date, duration, spec3):
@@ -16,6 +21,10 @@ class MaconomyRow:
     
     def short_str(self):
         return f"JobNr: {self.jobNr:<10} Task: {self.task:<24} Description: {self.description:<70} Duration: {self.duration:<4} Spec3: {self.spec3:<12}"
+    
+    def get_weekday(self):
+        dateInDatetime = datetime.strptime(self.date, '%Y-%m-%d')
+        return dateInDatetime.weekday()
 
 def get_maconomy_configured_entry(data, entry):
     for definition in data.get('definitions'):
