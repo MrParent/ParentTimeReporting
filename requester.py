@@ -98,7 +98,7 @@ def make_maconomy_request_get_employee_number():
 def make_maconomy_request_instance():
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances"
     
-    with open('instanceSetup.json') as f:
+    with open('instance_setup.json') as f:
         payload = json.load(f)
     payload = json.dumps(payload)
     contentLength = len(payload)

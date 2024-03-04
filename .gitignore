@@ -1,13 +1,4 @@
-__pycache__/toggl.cpython-311.pyc
-__pycache__/requester.cpython-311.pyc
-__pycache__/timeLog.cpython-311.pyc
-__pycache__/popup.cpython-311.pyc
-__pycache__/logger_config.cpython-311.pyc
 global.log
 config.json
 options.json
-__pycache__/maconomy.cpython-311.pyc
-__pycache__/maconomyEntry.cpython-311.pyc
-__pycache__/maconomyRow.cpython-311.pyc
-__pycache__/parentPythonApp.cpython-311.pyc
-__pycache__/options.cpython-311.pyc
+__pycache__/
