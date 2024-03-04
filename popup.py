@@ -26,8 +26,8 @@ class JiraPopupWindow(QDialog):
                 date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
                 self.listbox.addItem(date_item)
 
-            entryText = entry.short_str()
-            item = QListWidgetItem(entryText)
+            entry_text = entry.short_str()
+            item = QListWidgetItem(entry_text)
             item.setData(Qt.UserRole, entry)
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.CheckState.Checked)
@@ -88,10 +88,10 @@ class MaconomyPopupWindow(QDialog):
                 date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
                 self.listbox.addItem(date_item)
 
-            maconomyEntry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
-            entryText = maconomyEntry.short_str()
+            maconomy_entry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
+            entryText = maconomy_entry.short_str()
             item = QListWidgetItem(entryText)
-            item.setData(Qt.UserRole, maconomyEntry)
+            item.setData(Qt.UserRole, maconomy_entry)
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.CheckState.Checked)
             item.setFont(monospace_font)
@@ -111,20 +111,20 @@ class MaconomyPopupWindow(QDialog):
         self.setLayout(self.layout)
 
     def on_confirm_maconomy(self):
-        if not maconomyRow.maconomyCookie:
+        if not maconomyRow.maconomy_cookie:
             MaconomyLoginWindow().exec_()
         else:
             print("Push to Maconomy started")
-            updateCard = False
+            update_card = False
             for index in range(self.listbox.count()):
                 item = self.listbox.item(index)
                 if item.checkState() == Qt.Checked:
                     entry = item.data(Qt.UserRole)
                     logger.info(entry)
-                    if not updateCard:
+                    if not update_card:
                         logger.info("Updating card")
                         response = requester.make_maconomy_request_update_card(entry)
-                        updateCard = True
+                        update_card = True
                         logger.info(response)
                     response = requester.make_maconomy_request_insert_row(entry)
                     logger.info(response)
@@ -177,8 +177,8 @@ class MaconomyLoginWindow(QDialog):
         password = self.password_field.text()
         response = requester.make_maconomy_login_request(username, password)
         print("Done. Response: " + response.text)
-        maconomyRow.maconomyCookie = response.headers.get('Maconomy-Cookie')
-        print("Maconomy-Cookie: " + str(maconomyRow.maconomyCookie))
+        maconomyRow.maconomy_cookie = response.headers.get('Maconomy-Cookie')
+        print("Maconomy-Cookie: " + str(maconomyRow.maconomy_cookie))
 
         response = requester.make_maconomy_request_get_employee_number()
         print("Done. Response: " + response.text)

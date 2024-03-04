@@ -72,8 +72,8 @@ def make_maconomy_login_request(username, password):
     response = requests.request("GET", url, headers=headers, data=payload)
     logger.info("Maconomy Login Response = ")
     logger.info(response)
-    maconomyRow.maconomyCookie = response.headers.get('Maconomy-Cookie')
-    maconomyRow.cookieJar = response.cookies
+    maconomyRow.maconomy_cookie = response.headers.get('Maconomy-Cookie')
+    maconomyRow.cookie_jar = response.cookies
     return response
 
 def make_maconomy_request_get_employee_number():
@@ -83,16 +83,16 @@ def make_maconomy_request_get_employee_number():
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'X-Cookie {maconomyRow.maconomyCookie}',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Connection': 'keep-alive',
     'Accept': 'application/vnd.deltek.maconomy.environment+json; version=1.0'
     }
     
-    response = requests.request("GET", url, headers=headers, data=payload, cookies=maconomyRow.cookieJar)
+    response = requests.request("GET", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
     
     logger.info("Maconomy Employee Number Response = ")
     logger.info(response)
-    maconomyRow.employeeNumber = response.json().get('user').get('info').get('employeenumber').get('string').get('value')
+    maconomyRow.employee_number = response.json().get('user').get('info').get('employeenumber').get('string').get('value')
     return response
 
 def make_maconomy_request_instance():
@@ -107,23 +107,23 @@ def make_maconomy_request_instance():
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'X-Cookie {maconomyRow.maconomyCookie}',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Length': f'{contentLength}'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookieJar)
+    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
 
-    maconomyRow.concurrencyToken = response.headers.get('Maconomy-Concurrency-Control')
+    maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     responseJson = response.json()
-    maconomyRow.containerInstanceId = responseJson.get('meta').get('containerInstanceId')
+    maconomyRow.instance_id = responseJson.get('meta').get('containerInstanceId')
     logger.info("Maconomy Instance Response = ")
     logger.info(response)
     return response
 
 def make_maconomy_request_instance_data():
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.containerInstanceId}/data;any"
+    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data;any"
     
     payload = {}
     
@@ -131,24 +131,24 @@ def make_maconomy_request_instance_data():
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'X-Cookie {maconomyRow.maconomyCookie}',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Connection': 'keep-alive',
-    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrencyToken}',
+    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
     'Content-Length': '0',
     'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookieJar)
+    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
     
     logger.info("Maconomy Instance Data Response = ")
     logger.info(response)
     print(response.json())
-    maconomyRow.concurrencyToken = response.headers.get('Maconomy-Concurrency-Control')
+    maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
 def make_maconomy_request_update_card(entry):
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.containerInstanceId}/data/panes/card/0"
+    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/card/0"
     data = {
         "data": {
             "datevar": f"{entry.date}"
@@ -161,29 +161,29 @@ def make_maconomy_request_update_card(entry):
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'X-Cookie {maconomyRow.maconomyCookie}',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Connection': 'keep-alive',
-    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrencyToken}',
+    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Length': f'{contentLength}',
     'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookieJar)
+    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
     logger.info("Maconomy Update Card Response = ")
     logger.info(response)
     print(response.json())
-    maconomyRow.concurrencyToken = response.headers.get('Maconomy-Concurrency-Control')
+    maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
 def make_maconomy_request_insert_row(entry):
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.containerInstanceId}/data/panes/table?row=end"
+    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/table?row=end"
 
     dayOfWeek = entry.get_weekday() + 1
     data = {
         "data": {
-            "jobnumber": entry.jobNr,
+            "jobnumber": entry.job_nr,
             f"numberday{dayOfWeek}": entry.duration,
             "taskname": entry.task,
             f"descriptionday{dayOfWeek}": entry.description,
@@ -198,19 +198,19 @@ def make_maconomy_request_insert_row(entry):
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'X-Cookie {maconomyRow.maconomyCookie}',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Connection': 'keep-alive',
-    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrencyToken}',
+    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
     'Content-Length': f'{contentLength}',
     'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com',
-    'Referer': f'https://{options.maconomy_prod}-webclient.deltekfirst.com/workspace/weeklytimesheets;date={entry.date};EmployeeNumber={maconomyRow.employeeNumber}'
+    'Referer': f'https://{options.maconomy_prod}-webclient.deltekfirst.com/workspace/weeklytimesheets;date={entry.date};employeenumber={maconomyRow.employee_number}'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookieJar)
+    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
     logger.info("Maconomy Insert Row Response = ")
     logger.info(response)
     print(response.json())
-    maconomyRow.concurrencyToken = response.headers.get('Maconomy-Concurrency-Control')
+    maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response

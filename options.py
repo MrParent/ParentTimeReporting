@@ -16,9 +16,9 @@ class SettingsWindow(QDialog):
 
         #import the options from the config file
         with open('options.json') as f:
-            optionsJson = json.load(f)
-        self.company = optionsJson.get('company')
-        self.maconomy_prod = optionsJson.get('maconomy_prod')
+            options_json = json.load(f)
+        self.company = options_json.get('company')
+        self.maconomy_prod = options_json.get('maconomy_prod')
 
         self.company_label = QLabel("Company:")
         self.layout.addWidget(self.company_label)
@@ -64,7 +64,7 @@ def showSettingsWindow():
 
 def getOptions():
     with open('options.json') as f:
-        optionsJson = json.load(f)
-    company = optionsJson.get('company')
-    maconomy_prod = optionsJson.get('maconomy_prod')
+        options_json = json.load(f)
+    company = options_json.get('company')
+    maconomy_prod = options_json.get('maconomy_prod')
     return company, maconomy_prod
