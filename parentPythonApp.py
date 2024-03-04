@@ -5,6 +5,7 @@ from popup import JiraPopupWindow, MaconomyPopupWindow
 import timeLog
 import requester
 import sys
+import options
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
@@ -98,6 +99,8 @@ def get_toggl_entries():
 # Create the main application
 mainApplication = QApplication([])
 
+options.company, options.maconomy_prod = options.getOptions()
+
 # Create the main window
 window = QWidget()
 
@@ -134,10 +137,18 @@ hbox2.addWidget(end_date_edit)
 hbox2.addStretch(1)
 layout.addLayout(hbox2)
 
+hboxTopButtons = QHBoxLayout()
 toggl_entries_button = QPushButton("Get Toggl Entries (with api key)")
 toggl_entries_button.setFixedSize(400, 30)
 toggl_entries_button.clicked.connect(get_toggl_entries)
-layout.addWidget(toggl_entries_button)
+
+hboxTopButtons.addWidget(toggl_entries_button, alignment=Qt.AlignLeft)
+hboxTopButtons.addStretch(1)
+settings_button = QPushButton("Settings")
+settings_button.setFixedSize(200, 30)
+settings_button.clicked.connect(options.showSettingsWindow)
+hboxTopButtons.addWidget(settings_button, alignment=Qt.AlignRight)
+layout.addLayout(hboxTopButtons)
 
 # Create a QListWidget and add the strings to it as checkboxes
 listbox = QListWidget()
