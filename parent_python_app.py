@@ -18,15 +18,15 @@ def push_selected_items_jira():
         if item.checkState() == Qt.Checked:
             checked_items.append(item)
     
-    timeEntries_to_push = []
+    time_entries_to_push = []
 
     for item in checked_items:
-        timeEntry = item.data(Qt.UserRole)
-        if timeLog.is_valid_description(timeEntry.description):
-            timeEntries_to_push.append(timeEntry)
+        time_entry = item.data(Qt.UserRole)
+        if timeLog.is_valid_description(time_entry.description):
+            time_entries_to_push.append(time_entry)
 
-    popupWindow = JiraPopupWindow(timeEntries_to_push)
-    popupWindow.exec_()
+    popup_window = JiraPopupWindow(time_entries_to_push)
+    popup_window.exec_()
 
     #FIXME: if no api key is found, show default login fields.
 
@@ -38,16 +38,16 @@ def push_selected_items_maconomy():
         if item.checkState() == Qt.Checked:
             checked_items.append(item)
     
-    timeEntries_to_push = []
+    time_entries_to_push = []
 
     for item in checked_items:
-        timeEntry = item.data(Qt.UserRole)
-        if timeLog.is_valid_maconomy_entry(timeEntry):
-            timeEntries_to_push.append(timeEntry)
+        time_entry = item.data(Qt.UserRole)
+        if timeLog.is_valid_maconomy_entry(time_entry):
+            time_entries_to_push.append(time_entry)
 
-    timeEntries_to_push = timeLog.merge_time_logs(timeEntries_to_push)
-    popupWindow = MaconomyPopupWindow(timeEntries_to_push)
-    popupWindow.exec_()
+    time_entries_to_push = timeLog.merge_time_logs(time_entries_to_push)
+    popup_window = MaconomyPopupWindow(time_entries_to_push)
+    popup_window.exec_()
 
     # FIXME: if no api key is found, show default login fields. 
     # merge time entries of the same day, client, project and description
@@ -57,11 +57,11 @@ def push_selected_items_maconomy():
     # log the result of the push to Maconomy in a file
     
 # Function to add items to a QListWidget as checkboxes
-def add_items_as_checkboxes(listbox, timeEntries):
+def add_items_as_checkboxes(listbox, time_entries):
     listbox.clear()
     
     last_date = None
-    for entry in timeEntries:
+    for entry in time_entries:
         # If the start date of the entry is different from the last date, add a date item
         if entry.get_start_date() != last_date:
             last_date = entry.get_start_date()
@@ -80,7 +80,7 @@ def add_items_as_checkboxes(listbox, timeEntries):
 # Function to get the Toggl entries
 def get_toggl_entries():
     response = requester.make_toggl_request(start_date_edit.dateTime(), end_date_edit.dateTime())
-    timeEntries = []
+    time_entries = []
     
     for entry in response:
         #safe get entry start
@@ -90,14 +90,14 @@ def get_toggl_entries():
         description = entry.get('description', "None")
         client_name = entry.get('client_name', "None")
         project_name = entry.get('project_name', "None")
-        timeEntry = timeLog.TimeLog(start, stop, duration, description, client_name, project_name)
-        timeEntries.append(timeEntry)
+        time_entry = timeLog.TimeLog(start, stop, duration, description, client_name, project_name)
+        time_entries.append(time_entry)
     
-    add_items_as_checkboxes(listbox, timeEntries)
+    add_items_as_checkboxes(listbox, time_entries)
     #FIXME: if no api key is found, show default login fields.
 
 # Create the main application
-mainApplication = QApplication([])
+main_application = QApplication([])
 
 options.company, options.maconomy_prod = options.getOptions()
 
@@ -137,18 +137,18 @@ hbox2.addWidget(end_date_edit)
 hbox2.addStretch(1)
 layout.addLayout(hbox2)
 
-hboxTopButtons = QHBoxLayout()
+hbox_top_buttons = QHBoxLayout()
 toggl_entries_button = QPushButton("Get Toggl Entries (with api key)")
 toggl_entries_button.setFixedSize(400, 30)
 toggl_entries_button.clicked.connect(get_toggl_entries)
 
-hboxTopButtons.addWidget(toggl_entries_button, alignment=Qt.AlignLeft)
-hboxTopButtons.addStretch(1)
+hbox_top_buttons.addWidget(toggl_entries_button, alignment=Qt.AlignLeft)
+hbox_top_buttons.addStretch(1)
 settings_button = QPushButton("Settings")
 settings_button.setFixedSize(200, 30)
 settings_button.clicked.connect(options.showSettingsWindow)
-hboxTopButtons.addWidget(settings_button, alignment=Qt.AlignRight)
-layout.addLayout(hboxTopButtons)
+hbox_top_buttons.addWidget(settings_button, alignment=Qt.AlignRight)
+layout.addLayout(hbox_top_buttons)
 
 # Create a QListWidget and add the strings to it as checkboxes
 listbox = QListWidget()
@@ -192,4 +192,4 @@ window.setGeometry(100, 100, 1400, 600)
 window.show()
 
 # Start the main loop
-sys.exit(mainApplication.exec_())
+sys.exit(main_application.exec_())

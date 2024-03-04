@@ -1,7 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
 from base64 import b64encode
-import os
 import json
 from logger_config import logger
 import maconomyRow
