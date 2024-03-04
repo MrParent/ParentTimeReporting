@@ -45,6 +45,9 @@ class SettingsWindow(QDialog):
         self.setLayout(self.layout)
 
     def save_options(self):
+        #set global company value in module
+        global company
+        global maconomy_prod
         company = self.company_field.text()
         maconomy_prod = self.maconomy_prod_field.text()
         with open('options.json', 'w') as f:
