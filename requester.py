@@ -7,11 +7,11 @@ import maconomyRow
 import json
 import options
 
-def make_toggl_request(startTime, endTime):
+def make_toggl_request(start_time, end_time):
     #get the api key from the environment variable
     toggl_api_key = options.toggl_api_key 
-    startTime = startTime.toString("yyyy-MM-ddT00:00:00+00:00")
-    endTime = endTime.toString("yyyy-MM-ddT23:59:00+00:00")
+    start_time = start_time.toString("yyyy-MM-ddT00:00:00+00:00")
+    end_time = end_time.toString("yyyy-MM-ddT23:59:00+00:00")
     auth_string = b64encode(f"{toggl_api_key}:api_token".encode()).decode()
 
     headers = {
@@ -21,8 +21,8 @@ def make_toggl_request(startTime, endTime):
 
     params = {
         'meta' : 'true',
-        'start_date': startTime,
-        'end_date': endTime
+        'start_date': start_time,
+        'end_date': end_time
     }
 
     response = requests.get('https://api.track.toggl.com/api/v9/me/time_entries', headers=headers, params=params).json()
@@ -30,7 +30,7 @@ def make_toggl_request(startTime, endTime):
     logger.info(response)
     return response
 
-def make_jira_request(ticket, duration, startTime):
+def make_jira_request(ticket, duration, start_time):
     #get the api key from the environment variable
     jira_api_key = options.jira_api_key
     jira_user_name = options.jira_user_name
@@ -48,7 +48,7 @@ def make_jira_request(ticket, duration, startTime):
     body = {
         'timeSpent' : duration,
         'comment':{'type':'doc','version':1,'content':[]},
-        'started': startTime
+        'started': start_time
     }
 
     response = requests.post(url, headers=headers, json=body, params=params, auth=auth)
@@ -57,7 +57,7 @@ def make_jira_request(ticket, duration, startTime):
     return response
 
 def make_maconomy_login_request(username, password):
-    basicHeader = b64encode(f"{username}:{password}".encode()).decode()
+    basic_header = b64encode(f"{username}:{password}".encode()).decode()
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/auth/{options.maconomy_prod}"
 
     payload = {}
@@ -65,7 +65,7 @@ def make_maconomy_login_request(username, password):
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
     'Maconomy-Client': 'iAccess',
     'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
-    'Authorization': f'Basic {basicHeader}',
+    'Authorization': f'Basic {basic_header}',
     'Connection': 'keep-alive'
     }
 
@@ -101,7 +101,7 @@ def make_maconomy_request_instance():
     with open('instance_setup.json') as f:
         payload = json.load(f)
     payload = json.dumps(payload)
-    contentLength = len(payload)
+    content_length = len(payload)
 
     headers = {
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
@@ -110,14 +110,14 @@ def make_maconomy_request_instance():
     'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
     'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
-    'Content-Length': f'{contentLength}'
+    'Content-Length': f'{content_length}'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
 
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
-    responseJson = response.json()
-    maconomyRow.instance_id = responseJson.get('meta').get('containerInstanceId')
+    response_json = response.json()
+    maconomyRow.instance_id = response_json.get('meta').get('containerInstanceId')
     logger.info("Maconomy Instance Response = ")
     logger.info(response)
     return response
@@ -155,7 +155,7 @@ def make_maconomy_request_update_card(entry):
         }
     }
     payload = json.dumps(data)
-    contentLength = len(payload)
+    content_length = len(payload)
 
     headers = {
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
@@ -166,7 +166,7 @@ def make_maconomy_request_update_card(entry):
     'Connection': 'keep-alive',
     'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
-    'Content-Length': f'{contentLength}',
+    'Content-Length': f'{content_length}',
     'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
     }
 
@@ -180,19 +180,19 @@ def make_maconomy_request_update_card(entry):
 def make_maconomy_request_insert_row(entry):
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/table?row=end"
 
-    dayOfWeek = entry.get_weekday() + 1
+    day_of_week = entry.get_weekday() + 1
     data = {
         "data": {
             "jobnumber": entry.job_nr,
-            f"numberday{dayOfWeek}": entry.duration,
+            f"numberday{day_of_week}": entry.duration,
             "taskname": entry.task,
-            f"descriptionday{dayOfWeek}": entry.description,
+            f"descriptionday{day_of_week}": entry.description,
             "specification3name": entry.spec3
         }
     }
 
     payload = json.dumps(data)
-    contentLength = len(payload)
+    content_length = len(payload)
 
     headers = {
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
@@ -203,7 +203,7 @@ def make_maconomy_request_insert_row(entry):
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Connection': 'keep-alive',
     'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
-    'Content-Length': f'{contentLength}',
+    'Content-Length': f'{content_length}',
     'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com',
     'Referer': f'https://{options.maconomy_prod}-webclient.deltekfirst.com/workspace/weeklytimesheets;date={entry.date};employeenumber={maconomyRow.employee_number}'
     }

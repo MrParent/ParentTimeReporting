@@ -89,8 +89,8 @@ class MaconomyPopupWindow(QDialog):
                 self.listbox.addItem(date_item)
 
             maconomy_entry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
-            entryText = maconomy_entry.short_str()
-            item = QListWidgetItem(entryText)
+            entry_text = maconomy_entry.short_str()
+            item = QListWidgetItem(entry_text)
             item.setData(Qt.UserRole, maconomy_entry)
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.CheckState.Checked)
