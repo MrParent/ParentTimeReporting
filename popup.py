@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel, QLineEdit
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel, QLineEdit, QMessageBox
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
@@ -176,7 +176,16 @@ class MaconomyLoginWindow(QDialog):
         username = self.username_field.text()
         password = self.password_field.text()
         response = requester.make_maconomy_login_request(username, password)
+
+        print("Login response: " + response.text)
+        logger.info("Login response: " + response.text)
+
+        if response.status_code != 200:
+            show_login_failed_message()
+            return
+
         print("Done. Response: " + response.text)
+
         maconomyRow.maconomy_cookie = response.headers.get('Maconomy-Cookie')
         print("Maconomy-Cookie: " + str(maconomyRow.maconomy_cookie))
 
@@ -195,3 +204,10 @@ class MaconomyLoginWindow(QDialog):
         # Handle abort action here
         print("Login to Maconomy aborted")
         self.close()
+
+def show_login_failed_message():
+    msg = QMessageBox()
+    msg.setWindowTitle("Login failed")
+    msg.setText("Login failed. Please try again")
+    msg.setIcon(QMessageBox.Information)
+    msg.exec_()
