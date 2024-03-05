@@ -140,7 +140,7 @@ hbox2.addStretch(1)
 layout.addLayout(hbox2)
 
 hbox_top_buttons = QHBoxLayout()
-toggl_entries_button = QPushButton("Get Toggl Entries (with api key)")
+toggl_entries_button = QPushButton("Get Toggl Entries")
 toggl_entries_button.setFixedSize(400, 30)
 toggl_entries_button.clicked.connect(get_toggl_entries)
 
@@ -187,7 +187,7 @@ layout.addLayout(hbox3)
 window.setLayout(layout)
 
 # Set the window title and geometry
-window.setWindowTitle("Time log pusher")
+window.setWindowTitle("Parent time report tool")
 window.setGeometry(100, 100, 1400, 600)
 
 # Show the window

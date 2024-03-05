@@ -10,7 +10,7 @@ import options
 
 def make_toggl_request(start_time, end_time):
     toggl_api_key = options.toggl_api_key
-    
+
     if not toggl_api_key and not options.toggl_logged_in:
         logger.info("Toggl API key is not set and not logged in")
         TogglLoginWindow().exec_()
@@ -42,6 +42,8 @@ def make_toggl_request(start_time, end_time):
     if response.status_code != 200:
         logger.info("Toggl login failed. Please check the login information (and api key if used) and try again.")
         show_login_failed_message()
+        logger.info("Toggl Response = ")
+        logger.info(response)
         return
     else:
         options.toggl_logged_in = True
@@ -54,6 +56,11 @@ def make_jira_request(ticket, duration, start_time):
     #get the api key from the environment variable
     jira_api_key = options.jira_api_key
     jira_user_name = options.jira_user_name
+
+    if not jira_api_key or not jira_user_name:
+        logger.info("Jira API key or username is not set")
+        show_jira_login_failed_message()
+        return
 
     auth = HTTPBasicAuth(jira_user_name, jira_api_key)
 
@@ -239,6 +246,13 @@ def show_login_failed_message():
     msg = QMessageBox()
     msg.setWindowTitle("Login failed")
     msg.setText("Login failed. Please try again")
+    msg.setIcon(QMessageBox.Information)
+    msg.exec_()
+
+def show_jira_login_failed_message():
+    msg = QMessageBox()
+    msg.setWindowTitle("Login with api key failed")
+    msg.setText("Login with API key and username failed. Please check the api key and username environment variables and try again")
     msg.setIcon(QMessageBox.Information)
     msg.exec_()
 
