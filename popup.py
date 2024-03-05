@@ -181,7 +181,7 @@ class MaconomyLoginWindow(QDialog):
         logger.info("Login response: " + response.text)
 
         if response.status_code != 200:
-            show_login_failed_message()
+            requester.show_login_failed_message()
             return
 
         print("Done. Response: " + response.text)
@@ -204,10 +204,3 @@ class MaconomyLoginWindow(QDialog):
         # Handle abort action here
         print("Login to Maconomy aborted")
         self.close()
-
-def show_login_failed_message():
-    msg = QMessageBox()
-    msg.setWindowTitle("Login failed")
-    msg.setText("Login failed. Please try again")
-    msg.setIcon(QMessageBox.Information)
-    msg.exec_()

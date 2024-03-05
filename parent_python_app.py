@@ -80,8 +80,10 @@ def add_items_as_checkboxes(listbox, time_entries):
 # Function to get the Toggl entries
 def get_toggl_entries():
     response = requester.make_toggl_request(start_date_edit.dateTime(), end_date_edit.dateTime())
-    time_entries = []
+    if not response:
+        return
     
+    time_entries = []
     for entry in response:
         #safe get entry start
         start = entry.get('start', "None")

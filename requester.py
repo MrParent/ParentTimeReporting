@@ -1,5 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton, QLabel, QLineEdit, QMessageBox
 from base64 import b64encode
 import json
 from logger_config import logger
@@ -8,11 +9,23 @@ import json
 import options
 
 def make_toggl_request(start_time, end_time):
-    #get the api key from the environment variable
-    toggl_api_key = options.toggl_api_key 
+    toggl_api_key = options.toggl_api_key
+    
+    if not toggl_api_key and not options.toggl_logged_in:
+        logger.info("Toggl API key is not set and not logged in")
+        TogglLoginWindow().exec_()
+        if not options.toggl_username or not options.toggl_password:
+            logger.info("Toggl login is aborted")
+            return
+
     start_time = start_time.toString("yyyy-MM-ddT00:00:00+00:00")
     end_time = end_time.toString("yyyy-MM-ddT23:59:00+00:00")
-    auth_string = b64encode(f"{toggl_api_key}:api_token".encode()).decode()
+    
+    auth_string =""
+    if(not toggl_api_key):
+        auth_string = b64encode(f"{options.toggl_username}:{options.toggl_password}".encode()).decode()
+    else:
+        auth_string = b64encode(f"{toggl_api_key}:api_token".encode()).decode()
 
     headers = {
         'content-type': 'application/json',
@@ -25,7 +38,14 @@ def make_toggl_request(start_time, end_time):
         'end_date': end_time
     }
 
-    response = requests.get('https://api.track.toggl.com/api/v9/me/time_entries', headers=headers, params=params).json()
+    response = requests.get('https://api.track.toggl.com/api/v9/me/time_entries', headers=headers, params=params)
+    if response.status_code != 200:
+        logger.info("Toggl login failed. Please check the login information (and api key if used) and try again.")
+        show_login_failed_message()
+        return
+    else:
+        options.toggl_logged_in = True
+    response = response.json()
     logger.info("Toggl Response = ")
     logger.info(response)
     return response
@@ -214,3 +234,59 @@ def make_maconomy_request_insert_row(entry):
     print(response.json())
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
+
+def show_login_failed_message():
+    msg = QMessageBox()
+    msg.setWindowTitle("Login failed")
+    msg.setText("Login failed. Please try again")
+    msg.setIcon(QMessageBox.Information)
+    msg.exec_()
+
+
+class TogglLoginWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        options.toggl_username = None
+        options.toggl_password = None
+
+        self.setWindowTitle("Toggl Login")
+
+        self.layout = QVBoxLayout()
+
+        self.username_label = QLabel("Username:")
+        self.layout.addWidget(self.username_label)
+
+        self.username_field = QLineEdit()
+        self.layout.addWidget(self.username_field)
+
+        self.password_label = QLabel("Password:")
+        self.layout.addWidget(self.password_label)
+
+        self.password_field = QLineEdit()
+        self.password_field.setEchoMode(QLineEdit.Password)
+        self.layout.addWidget(self.password_field)
+
+        self.layout.addSpacing(10)  # Add spacing between the fields and buttons
+
+        self.confirm_button = QPushButton("Confirm")
+        self.confirm_button.clicked.connect(self.on_confirm_toggl_login)
+        self.layout.addWidget(self.confirm_button)
+
+        self.abort_button = QPushButton("Abort")
+        self.abort_button.clicked.connect(self.on_abort)
+        self.layout.addWidget(self.abort_button)
+
+        self.setGeometry(100, 100, 260, 100)
+
+        self.setLayout(self.layout)
+
+    def on_confirm_toggl_login(self):
+        options.toggl_username = self.username_field.text()
+        options.toggl_password = self.password_field.text()
+        self.close()
+
+    def on_abort(self):
+        # Handle abort action here
+        print("Login to Toggl aborted")
+        self.close()

@@ -5,6 +5,9 @@ import json
 toggl_api_key = os.getenv('TOGGL_API_KEY')
 jira_api_key = os.getenv('JIRA_API_KEY')
 jira_user_name = os.getenv('JIRA_USER_NAME')
+toggl_username = ""
+toggl_password = ""
+toggl_logged_in = False
 company = ""
 maconomy_prod = ""
 
