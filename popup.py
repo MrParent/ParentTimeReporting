@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 import requester
 import maconomyRow
 from logger_config import logger
+from collections import defaultdict
 
 # Create a QFont object for a monospace font.
 monospace_font = QFont("Courier")
@@ -112,25 +113,9 @@ class MaconomyPopupWindow(QDialog):
 
     # Confirm Maconomy push. FIXME: Add progress functionality.
     def on_confirm_maconomy(self):
-        if not maconomyRow.maconomy_cookie:
-            MaconomyLoginWindow().exec_()
-        else:
-            print("Push to Maconomy started")
-            update_card = False
-            for index in range(self.listbox.count()):
-                item = self.listbox.item(index)
-                if item.checkState() == Qt.Checked:
-                    entry = item.data(Qt.UserRole)
-                    logger.info(entry)
-                    if not update_card:
-                        logger.info("Updating card")
-                        response = requester.make_maconomy_request_update_card(entry)
-                        update_card = True
-                        logger.info(response)
-                    response = requester.make_maconomy_request_insert_row(entry)
-                    logger.info(response)
-            print("Push to Maconomy finished")
-            self.close()
+        MaconomyLoginWindow(self.listbox, self).exec_()
+        #else:
+            
 
     # Abort Maconomy push.
     def on_abort(self):
@@ -139,9 +124,9 @@ class MaconomyPopupWindow(QDialog):
 
 # Class to create the Maconomy login window.
 class MaconomyLoginWindow(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, listbox, parent=None):
         super().__init__(parent)
-
+        self.listbox = listbox
         self.setWindowTitle("Maconomy Login")
 
         self.layout = QVBoxLayout()
@@ -175,6 +160,7 @@ class MaconomyLoginWindow(QDialog):
     def on_confirm_maconomy_login(self):
         username = self.username_field.text()
         password = self.password_field.text()
+        print("Login to Maconomy started")
         response = requester.make_maconomy_login_request(username, password)
 
         print("Login response: " + response.text)
@@ -184,11 +170,10 @@ class MaconomyLoginWindow(QDialog):
             requester.show_login_failed_message()
             return
 
-        print("Done. Response: " + response.text)
-
         maconomyRow.maconomy_cookie = response.headers.get('Maconomy-Cookie')
         print("Maconomy-Cookie: " + str(maconomyRow.maconomy_cookie))
 
+        print("Setup of maconomy started")
         response = requester.make_maconomy_request_get_employee_number()
         print("Done. Response: " + response.text)
         
@@ -197,8 +182,64 @@ class MaconomyLoginWindow(QDialog):
 
         response = requester.make_maconomy_request_instance_data()
         print("Done. Response: " + response.text)
+        print("Setup of maconomy finished")
 
+        print("Push of maconomy rows started")
+        update_card = False
+        # Create a dictionary with the key (job_nr, task, description) 
+        # and the value a list of entries with the same key
+        entries_dict = defaultdict(list)
+        for index in range(self.listbox.count()):
+            item = self.listbox.item(index)
+            if item.checkState() == Qt.Checked:
+                entry = item.data(Qt.UserRole)
+                key = (entry.job_nr, entry.task, entry.description)
+                entries_dict[key].append(entry)
+        # Combine the entries for each key
+        combined_entries = []
+        for key, entries in entries_dict.items():
+            combined_entries.append(self.combine_entries(entries))
+
+        print(combined_entries)
+
+        for job_nr, task, description, spec3, durations in combined_entries:
+            if not update_card:
+                logger.info("Updating card")
+                response = requester.make_maconomy_request_update_card(entry)
+                update_card = True
+                logger.info(response)
+            response = requester.make_maconomy_request_insert_row_merged(job_nr, task, description, spec3, durations)
+            logger.info(response)
+
+        print("Push to Maconomy finished")
         self.close()
+        self.parent().close()
+        # for index in range(self.listbox.count()):
+        #     item = self.listbox.item(index)
+        #     if item.checkState() == Qt.Checked:
+        #         entry = item.data(Qt.UserRole)
+        #         logger.info(entry)
+        #         if not update_card:
+        #             logger.info("Updating card")
+        #             response = requester.make_maconomy_request_update_card(entry)
+        #             update_card = True
+        #             logger.info(response)
+        #         response = requester.make_maconomy_request_insert_row(entry)
+        #         logger.info(response)
+        #print("Push to Maconomy finished")
+        #self.close()
+        #self.parent().close()
+
+    # Combine the entries for the same key
+    def combine_entries(self, entries):
+    # Combine the entries by summing the durations for each day of the week
+        durations = defaultdict(int)
+        for entry in entries:
+            day_of_week = entry.get_weekday() + 1
+            durations[day_of_week] += entry.duration
+
+        job_nr, task, description, spec3 = entries[0].job_nr, entries[0].task, entries[0].description, entries[0].spec3
+        return job_nr, task, description, spec3, durations
 
     # Abort Maconomy login.
     def on_abort(self):

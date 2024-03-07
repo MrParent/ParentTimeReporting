@@ -250,6 +250,45 @@ def make_maconomy_request_insert_row(entry):
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
+# The maconomy request function to insert a merged row in the timesheet.
+def make_maconomy_request_insert_row_merged(job_nr, task, description, spec3, durations):
+    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/table?row=end"
+
+    data = {
+        "data": {
+            "jobnumber": job_nr,
+            "taskname": task,
+            "specification3name": spec3
+        }
+    }
+
+    for day_of_week, duration in durations.items():
+        data["data"][f"numberday{day_of_week}"] = duration
+        data["data"][f"descriptionday{day_of_week}"] = description
+
+    payload = json.dumps(data)
+    content_length = len(payload)
+
+    headers = {
+    'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
+    'Maconomy-Client': 'iAccess',
+    'Maconomy-Format': 'date-format="yyyy-MM-dd";time-format="HH:mm";thousand-separator=",";decimal-separator=".";number-of-decimals=2',
+    'Authorization': f'X-Cookie {maconomyRow.maconomy_cookie}',
+    'Accept': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
+    'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
+    'Connection': 'keep-alive',
+    'Maconomy-Concurrency-Control': f'{maconomyRow.concurrency_token}',
+    'Content-Length': f'{content_length}',
+    'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomyRow.cookie_jar)
+    logger.info("Maconomy Insert Row Response = ")
+    logger.info(response)
+    print(response.json())
+    maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
+    return response
+
 # Show login failed message.
 def show_login_failed_message():
     msg = QMessageBox()
