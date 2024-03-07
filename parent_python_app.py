@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidgetItem, QLabel
+from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget, QListWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidgetItem, QLabel, QDialog
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QFont
 from popup import JiraPopupWindow, MaconomyPopupWindow
@@ -6,6 +6,7 @@ import timeLog
 import requester
 import sys
 import options
+import editRowDialog
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
@@ -98,6 +99,14 @@ def get_toggl_entries():
     add_items_as_checkboxes(listbox, time_entries)
     #FIXME: if no api key is found, show default login fields.
 
+# Function to handle double click on an item in the listbox.
+def on_item_double_clicked(item):
+    print(item.text())
+    edit_dialog = editRowDialog.EditRowDialog(item.data(Qt.UserRole))
+    if edit_dialog.exec_() == QDialog.Accepted:
+        # Update the text of the item after the dialog is closed
+        item.setText(str(item.data(Qt.UserRole)))
+
 # parent python app main module code
 main_application = QApplication([])
 options.company, options.maconomy_prod = options.getOptions()
@@ -147,6 +156,7 @@ listbox = QListWidget()
 
 listbox.setSelectionMode(QListWidget.MultiSelection)
 listbox.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+listbox.itemDoubleClicked.connect(on_item_double_clicked)
 
 jira_button = QPushButton("Push to Jira worklogs")
 jira_button.setFixedSize(200, 30)
