@@ -19,12 +19,12 @@ This config.json file, that you have to have in the same folder as the program, 
 ```json
 {
   "defaults": {
-    "spec3": "ROLE_YOU_HAVE"
+    "spec3": "ROLEYOUHAVE"
   },
   "definitions": [
     {
       "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER1",
-      "remote-job": "JOBNR1",
+      "remote-job": "JOBNRINMACONOMY1",
       "spec3": "OTHERROLETHANDEFAULT",
       "tasks": [
         {
@@ -39,7 +39,7 @@ This config.json file, that you have to have in the same folder as the program, 
     },
 	{
       "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER2",
-      "remote-job": "JOBNR2",
+      "remote-job": "JOBNRINMACONOMY2",
       "tasks": [
         {
           "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT2",
