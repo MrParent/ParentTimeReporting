@@ -1,6 +1,7 @@
 import re
 from datetime import datetime, timedelta, timezone
 
+# Class to represent a time log entry in main window.
 class TimeLog :
     def __init__(self, start, stop, duration, description, client_name, project_name):
         self.start = start
@@ -39,31 +40,29 @@ class TimeLog :
 
 # Check if a string is a valid Jira issue description
 def is_valid_description(description):
-    # The regex pattern
     pattern = r'^[A-Z]+-\d+$'
-    
-    # Use the match function to check if the description matches the pattern
     match = re.match(pattern, description)
-    
-    # If the match function returns a match object, the description is valid
     return match is not None
 
-# Check if a TimeLog entry is valid for Maconomy. FIXME: Check against mapping for valid Maconomy entries
+# Check if a TimeLog entry is valid for Maconomy. FIXME: Check against mapping for valid Maconomy entries.
 def is_valid_maconomy_entry(entry):
     if(entry.duration and entry.start and entry.project_name and entry.client_name):
         return True
     else:
         return False
 
+# Convert seconds to hours, minutes, and seconds. Needed?
 def convert_seconds(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return hours, minutes, seconds
 
+# Convert seconds to minutes. Needed?
 def convert_to_minutes(seconds):
     minutes, remainder = divmod(seconds, 60)
     return minutes
 
+# Format a time to a specific timezone.
 def format_time(input_time, timezone_offset):
     # Parse the time from the input format
     dt = datetime.strptime(input_time, '%Y-%m-%dT%H:%M:%S%z')
@@ -76,23 +75,19 @@ def format_time(input_time, timezone_offset):
 
     return formatted_time
 
+# Merge time logs with the same start date, description, client name, and project name.
 def merge_time_logs(time_logs):
-    # Create a dictionary to group the time logs
     grouped_time_logs = {}
 
     for time_log in time_logs:
-        # Create a key for the day, description, client_name, and project_name
         key = (time_log.get_start_date(), time_log.description, time_log.client_name, time_log.project_name)
 
-        # If the key is not in the dictionary, add the time log to the dictionary
         if key not in grouped_time_logs:
             grouped_time_logs[key] = time_log
         else:
-            # If the key is in the dictionary, merge the time logs
             existing_time_log = grouped_time_logs[key]
             existing_time_log.duration += time_log.duration
             existing_time_log.stop = max(existing_time_log.stop, time_log.stop)
             existing_time_log.start = min(existing_time_log.start, time_log.start)
 
-    # Return the merged time logs
     return list(grouped_time_logs.values())

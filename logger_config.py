@@ -1,7 +1,7 @@
 import logging
 
+# Setup logger.
 def setup_logger():
-    # Create a logger
     logger = logging.getLogger('global_logger')
     logger.setLevel(logging.INFO)
 
@@ -12,9 +12,8 @@ def setup_logger():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
 
-    # Add the handler to the logger
     logger.addHandler(handler)
-
     return logger
 
+# Create logger.
 logger = setup_logger()

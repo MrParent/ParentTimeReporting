@@ -6,8 +6,10 @@ import requester
 import maconomyRow
 from logger_config import logger
 
+# Create a QFont object for a monospace font.
 monospace_font = QFont("Courier")
 
+# Class to create the Jira popup window.
 class JiraPopupWindow(QDialog):
     def __init__(self, entries, parent=None):
         super(JiraPopupWindow, self).__init__(parent)
@@ -18,12 +20,11 @@ class JiraPopupWindow(QDialog):
         self.listbox = QListWidget()
         last_date = None
         for entry in entries:
-            # If the start date of the entry is different from the last date, add a date item
             if entry.get_start_date() != last_date:
                 last_date = entry.get_start_date()
                 date_item = QListWidgetItem(last_date)
                 date_item.setFlags(Qt.NoItemFlags)  # Make the item non-selectable and non-checkable
-                date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
+                date_item.setFont(QFont('Arial', 10, QFont.Bold))
                 self.listbox.addItem(date_item)
 
             entry_text = entry.short_str()
@@ -47,7 +48,7 @@ class JiraPopupWindow(QDialog):
         self.setGeometry(800, 300, 400, 300)
         self.setLayout(self.layout)
 
-    # FIXME: Add progress functionality
+    # Confirm jira push. FIXME: Add progress functionality.
     def on_confirm_jira(self):
         print("Push to Jira started")
         # Handle confirm action here
@@ -64,12 +65,12 @@ class JiraPopupWindow(QDialog):
         print("Push to Jira finished")
         self.close()
 
+    # Abort jira push.
     def on_abort(self):
-        # Handle abort action here
         print("Push to Jira aborted")
         self.close()
 
-
+# Class to create the Maconomy popup window.
 class MaconomyPopupWindow(QDialog):
     def __init__(self, entries, parent=None):
         super(MaconomyPopupWindow, self).__init__(parent)
@@ -80,12 +81,11 @@ class MaconomyPopupWindow(QDialog):
         self.listbox = QListWidget()
         last_date = None
         for entry in entries:
-            # If the start date of the entry is different from the last date, add a date item
             if entry.get_start_date() != last_date:
                 last_date = entry.get_start_date()
                 date_item = QListWidgetItem(last_date)
                 date_item.setFlags(Qt.NoItemFlags)  # Make the item non-selectable and non-checkable
-                date_item.setFont(QFont('Arial', 10, QFont.Bold))  # Make the item bold
+                date_item.setFont(QFont('Arial', 10, QFont.Bold))
                 self.listbox.addItem(date_item)
 
             maconomy_entry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
@@ -110,6 +110,7 @@ class MaconomyPopupWindow(QDialog):
         self.setGeometry(100, 100, 1500, 600)
         self.setLayout(self.layout)
 
+    # Confirm Maconomy push. FIXME: Add progress functionality.
     def on_confirm_maconomy(self):
         if not maconomyRow.maconomy_cookie:
             MaconomyLoginWindow().exec_()
@@ -128,16 +129,15 @@ class MaconomyPopupWindow(QDialog):
                         logger.info(response)
                     response = requester.make_maconomy_request_insert_row(entry)
                     logger.info(response)
-            # Handle confirm action here
             print("Push to Maconomy finished")
             self.close()
 
+    # Abort Maconomy push.
     def on_abort(self):
-        # Handle abort action here
         print("Push to Maconomy aborted")
         self.close()
 
-
+# Class to create the Maconomy login window.
 class MaconomyLoginWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -159,7 +159,7 @@ class MaconomyLoginWindow(QDialog):
         self.password_field.setEchoMode(QLineEdit.Password)
         self.layout.addWidget(self.password_field)
 
-        self.layout.addSpacing(10)  # Add spacing between the fields and buttons
+        self.layout.addSpacing(10)
 
         self.confirm_button = QPushButton("Confirm")
         self.confirm_button.clicked.connect(self.on_confirm_maconomy_login)
@@ -169,9 +169,9 @@ class MaconomyLoginWindow(QDialog):
         self.layout.addWidget(self.abort_button)
 
         self.setGeometry(100, 100, 260, 100)
-
         self.setLayout(self.layout)
 
+    # Confirm Maconomy login.
     def on_confirm_maconomy_login(self):
         username = self.username_field.text()
         password = self.password_field.text()
@@ -200,7 +200,7 @@ class MaconomyLoginWindow(QDialog):
 
         self.close()
 
+    # Abort Maconomy login.
     def on_abort(self):
-        # Handle abort action here
         print("Login to Maconomy aborted")
         self.close()

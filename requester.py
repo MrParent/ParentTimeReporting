@@ -8,6 +8,7 @@ import maconomyRow
 import json
 import options
 
+# The toggl web request function.
 def make_toggl_request(start_time, end_time):
     toggl_api_key = options.toggl_api_key
 
@@ -52,6 +53,7 @@ def make_toggl_request(start_time, end_time):
     logger.info(response)
     return response
 
+# The jira web request function.
 def make_jira_request(ticket, duration, start_time):
     #get the api key from the environment variable
     jira_api_key = options.jira_api_key
@@ -83,6 +85,7 @@ def make_jira_request(ticket, duration, start_time):
     logger.info(response)
     return response
 
+# The maconomy login request function.
 def make_maconomy_login_request(username, password):
     basic_header = b64encode(f"{username}:{password}".encode()).decode()
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/auth/{options.maconomy_prod}"
@@ -103,6 +106,7 @@ def make_maconomy_login_request(username, password):
     maconomyRow.cookie_jar = response.cookies
     return response
 
+# The maconomy request function to get the employee number.
 def make_maconomy_request_get_employee_number():
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/environment/{options.maconomy_prod}?variables=user.info.employeenumber"
     payload = {}
@@ -122,6 +126,7 @@ def make_maconomy_request_get_employee_number():
     maconomyRow.employee_number = response.json().get('user').get('info').get('employeenumber').get('string').get('value')
     return response
 
+# The maconomy request function to create and get the instance id.
 def make_maconomy_request_instance():
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances"
     
@@ -149,6 +154,7 @@ def make_maconomy_request_instance():
     logger.info(response)
     return response
 
+# The maconomy request function to call the instance data once (initialize?).
 def make_maconomy_request_instance_data():
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data;any"
     
@@ -174,6 +180,7 @@ def make_maconomy_request_instance_data():
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
+# The maconomy request function to update the card to the right week.
 def make_maconomy_request_update_card(entry):
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/card/0"
     data = {
@@ -204,6 +211,7 @@ def make_maconomy_request_update_card(entry):
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
+# The maconomy request function to insert a row in the timesheet.
 def make_maconomy_request_insert_row(entry):
     url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomyRow.instance_id}/data/panes/table?row=end"
 
@@ -242,6 +250,7 @@ def make_maconomy_request_insert_row(entry):
     maconomyRow.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
+# Show login failed message.
 def show_login_failed_message():
     msg = QMessageBox()
     msg.setWindowTitle("Login failed")
@@ -249,6 +258,7 @@ def show_login_failed_message():
     msg.setIcon(QMessageBox.Information)
     msg.exec_()
 
+# Show jira login failed message.
 def show_jira_login_failed_message():
     msg = QMessageBox()
     msg.setWindowTitle("Login with api key failed")
@@ -256,7 +266,7 @@ def show_jira_login_failed_message():
     msg.setIcon(QMessageBox.Information)
     msg.exec_()
 
-
+# The Toggl login window.
 class TogglLoginWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -295,11 +305,13 @@ class TogglLoginWindow(QDialog):
 
         self.setLayout(self.layout)
 
+    # The confirm button action.
     def on_confirm_toggl_login(self):
         options.toggl_username = self.username_field.text()
         options.toggl_password = self.password_field.text()
         self.close()
 
+    # The abort button action.
     def on_abort(self):
         # Handle abort action here
         print("Login to Toggl aborted")
