@@ -23,26 +23,26 @@ This config.json file, that you have to have in the same folder as the program, 
   },
   "definitions": [
     {
-      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGL1",
+      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER1",
       "remote-job": "JOBNR1",
       "spec3": "OTHERROLETHANDEFAULT",
       "tasks": [
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGL1",
+          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT1",
           "remote-task": "TASKNAMEINMACONOMY1"
         },
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGL2",
+          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT2",
           "remote-task": "TASKNAMEINMACONOMY2"
         }
       ]
     },
 	{
-      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGL2",
+      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER2",
       "remote-job": "JOBNR2",
       "tasks": [
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGL2",
+          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT2",
           "remote-task": "TASKNAMEINMACONOMY2"
         }
       ]
