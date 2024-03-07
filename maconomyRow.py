@@ -34,12 +34,12 @@ class MaconomyRow:
 # Function to create the Maconomy row by using the config file.
 def get_maconomy_configured_entry(data, entry):
     for definition in data.get('definitions'):
-        print(definition.get('local-job'))
-        print(entry.client_name)
+        #print(definition.get('local-job'))
+        #print(entry.client_name)
         if definition.get('local-job') == entry.client_name:
             for task in definition.get('tasks'):
-                print(definition.get('local-task')) 
-                print(entry.project_name)
+                #print(definition.get('local-task')) 
+                #print(entry.project_name)
                 if task.get('local-task') == entry.project_name:
                     spec3 = definition.get('spec3')
                     if not spec3:

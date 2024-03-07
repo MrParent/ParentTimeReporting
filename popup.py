@@ -200,7 +200,7 @@ class MaconomyLoginWindow(QDialog):
         for key, entries in entries_dict.items():
             combined_entries.append(self.combine_entries(entries))
 
-        print(combined_entries)
+        #print(combined_entries)
 
         for job_nr, task, description, spec3, durations in combined_entries:
             if not update_card:
