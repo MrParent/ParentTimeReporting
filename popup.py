@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
 import requester
-import maconomyRow
+import maconomy_row
 from logger_config import logger
 from collections import defaultdict
 
@@ -89,7 +89,7 @@ class MaconomyPopupWindow(QDialog):
                 date_item.setFont(QFont('Arial', 10, QFont.Bold))
                 self.listbox.addItem(date_item)
 
-            maconomy_entry = maconomyRow.get_maconomy_configured_entry(maconomyRow.maconomy_config, entry)
+            maconomy_entry = maconomy_row.get_maconomy_configured_entry(maconomy_row.maconomy_config, entry)
             entry_text = maconomy_entry.short_str()
             item = QListWidgetItem(entry_text)
             item.setData(Qt.UserRole, maconomy_entry)
@@ -170,8 +170,8 @@ class MaconomyLoginWindow(QDialog):
             requester.show_login_failed_message()
             return
 
-        maconomyRow.maconomy_cookie = response.headers.get('Maconomy-Cookie')
-        print("Maconomy-Cookie: " + str(maconomyRow.maconomy_cookie))
+        maconomy_row.maconomy_cookie = response.headers.get('Maconomy-Cookie')
+        print("Maconomy-Cookie: " + str(maconomy_row.maconomy_cookie))
 
         print("Setup of maconomy started")
         response = requester.make_maconomy_request_get_employee_number()

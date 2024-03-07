@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QApplication, QAbstractItemView, QDateEdit, QWidget,
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QFont
 from popup import JiraPopupWindow, MaconomyPopupWindow
-import timeLog
+import time_log
 import requester
 import sys
 import options
-import editRowDialog
+import edit_row_dialog
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
@@ -23,7 +23,7 @@ def push_selected_items_jira():
 
     for item in checked_items:
         time_entry = item.data(Qt.UserRole)
-        if timeLog.is_valid_description(time_entry.description):
+        if time_log.is_valid_description(time_entry.description):
             time_entries_to_push.append(time_entry)
 
     popup_window = JiraPopupWindow(time_entries_to_push)
@@ -43,10 +43,10 @@ def push_selected_items_maconomy():
 
     for item in checked_items:
         time_entry = item.data(Qt.UserRole)
-        if timeLog.is_valid_maconomy_entry(time_entry):
+        if time_log.is_valid_maconomy_entry(time_entry):
             time_entries_to_push.append(time_entry)
 
-    time_entries_to_push = timeLog.merge_time_logs(time_entries_to_push)
+    time_entries_to_push = time_log.merge_time_logs(time_entries_to_push)
     popup_window = MaconomyPopupWindow(time_entries_to_push)
     popup_window.exec_()
 
@@ -93,7 +93,7 @@ def get_toggl_entries():
         description = entry.get('description', "None")
         client_name = entry.get('client_name', "None")
         project_name = entry.get('project_name', "None")
-        time_entry = timeLog.TimeLog(start, stop, duration, description, client_name, project_name)
+        time_entry = time_log.TimeLog(start, stop, duration, description, client_name, project_name)
         time_entries.append(time_entry)
     
     add_items_as_checkboxes(listbox, time_entries)
@@ -102,7 +102,7 @@ def get_toggl_entries():
 # Function to handle double click on an item in the listbox.
 def on_item_double_clicked(item):
     print(item.text())
-    edit_dialog = editRowDialog.EditRowDialog(item.data(Qt.UserRole))
+    edit_dialog = edit_row_dialog.EditRowDialog(item.data(Qt.UserRole))
     if edit_dialog.exec_() == QDialog.Accepted:
         # Update the text of the item after the dialog is closed
         item.setText(str(item.data(Qt.UserRole)))
