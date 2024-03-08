@@ -19,31 +19,31 @@ This config.json file, that you have to have in the same folder as the program, 
 ```json
 {
   "defaults": {
-    "spec3": "ROLEYOUHAVE"
+    "spec3": "ROLE_YOU_HAVE"
   },
   "definitions": [
     {
-      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER1",
-      "remote-job": "JOBNRINMACONOMY1",
-      "spec3": "OTHERROLETHANDEFAULT",
+      "local-job": "JOBNAME_IN_TOGGL_AS_CUSTOMER_1",
+      "remote-job": "JOBNR_IN_MACONOMY_1",
+      "spec3": "OTHER_ROLE_THAN_DEFAULT_1",
       "tasks": [
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT1",
-          "remote-task": "TASKNAMEINMACONOMY1"
+          "local-task": "TASKNAME_IN_TOGGL_AS_PROJECT_1",
+          "remote-task": "TASKNAME_IN_MACONOMY_1"
         },
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT2",
-          "remote-task": "TASKNAMEINMACONOMY2"
+          "local-task": "TASKNAME_IN_TOGGL_AS_PROJECT_2",
+          "remote-task": "TASKNAME_IN_MACONOMY_2"
         }
       ]
     },
 	{
-      "local-job": "JOBNAMEYOUWANTTOSPECIFYINTOGGLASCUSTOMER2",
-      "remote-job": "JOBNRINMACONOMY2",
+      "local-job": "JOBNAME_IN_TOGGL_AS_CUSTOMER_2",
+      "remote-job": "JOBNR_IN_MACONOMY_2",
       "tasks": [
         {
-          "local-task": "TASKNAMEYOUWANTTOSPECINTOGGLASPROJECT2",
-          "remote-task": "TASKNAMEINMACONOMY2"
+          "local-task": "TASKNAME_IN_TOGGL_AS_PROJECT_2",
+          "remote-task": "TASKNAME_IN_MACONOMY_2"
         }
       ]
     }
