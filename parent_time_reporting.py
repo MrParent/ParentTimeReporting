@@ -7,6 +7,7 @@ import requester
 import sys
 import options
 import edit_row_dialog
+import optimize
 
 # Create a QFont object for a monospace font
 monospace_font = QFont("Courier")
@@ -99,6 +100,17 @@ def get_toggl_entries():
     add_items_as_checkboxes(listbox, time_entries)
     #FIXME: if no api key is found, show default login fields.
 
+# Get the optimize entries and populate main window listbox.
+def get_optimize_entries():
+    start_time = start_date_edit.dateTime().toString("yyyy-MM-ddT00:00:00+00:00")
+    end_time = end_date_edit.dateTime().toString("yyyy-MM-ddT23:59:00+00:00")
+
+    time_entries = optimize.open_and_parse_optimize_file(start_time, end_time)
+    if time_entries:
+        add_items_as_checkboxes(listbox, time_entries)
+    else:
+        print("No time entries found.")
+
 # Function to handle double click on an item in the listbox.
 def on_item_double_clicked(item):
     print(item.text())
@@ -145,6 +157,12 @@ toggl_entries_button.setFixedSize(200, 30)
 toggl_entries_button.clicked.connect(get_toggl_entries)
 
 hbox_top_buttons.addWidget(toggl_entries_button, alignment=Qt.AlignLeft)
+
+optimize_button = QPushButton("Optimize")
+optimize_button.setFixedSize(200, 30)
+optimize_button.clicked.connect(get_optimize_entries)
+hbox_top_buttons.addWidget(optimize_button, alignment=Qt.AlignLeft)
+
 hbox_top_buttons.addStretch(1)
 settings_button = QPushButton("Settings")
 settings_button.setFixedSize(140, 30)
