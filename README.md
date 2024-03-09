@@ -1,4 +1,4 @@
-This is for you whom do not like to spend time on reporting time in Maconomy and in Jira. You are also a user of Toggl or another timer program (that might be supported in the future).
+This is for you whom do not like to spend time on reporting time in Maconomy and in Jira. You are also a user of Toggl or Optimize(old timer program).
 
 For this to work, you will need to specify what company you have (to build the URL for pushing time logs on tickets) and you will need to specify the Maconomy prod (also to build the Maconomy URL for your company).
 This can be done with the settings button in the program.
@@ -50,4 +50,7 @@ This config.json file, that you have to have in the same folder as the program, 
   ]
 }
 ```
+If you use Optimize, you will have to write the description for a task in the form (toggl language): Client;Project;Description
+You also have to select the OptTimes.txt file that optimize generates when prompted for a file.
+
 Special thanks to Guppan for making this possible and for solving a lot of the issues regarding pushing time rows to Maconomy.
