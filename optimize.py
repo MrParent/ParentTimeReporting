@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QFileDialog
 # open file dialog.
 def open_file_dialog():
     #open file dialog with txt file filter
-    dialog = QFileDialog(filter="Text files (*.txt)")
-    filename, _ = dialog.getOpenFileName()
+    dialog = QFileDialog()
+    filename, _ = dialog.getOpenFileName(None, "Open File", "OptTimes.txt", "Text files (*.txt)")
     
     if filename:
         print(f"Selected file: {filename}")
@@ -44,9 +44,13 @@ def parse_file(start_time, end_time, filename):
                 continue
 
             duration = int((stop_entry - start_entry).total_seconds())
-            print(duration)
 
-            client_name, project_name, task = description.split(';')
+            parts = description.split(';')
+            if len(parts) == 3:
+                client_name, project_name, task = parts
+            else:
+                client_name = parts[0]
+                project_name = task = None
             
             start_entry_str = start_entry.strftime('%Y-%m-%dT%H:%M:%S%z')
             stop_entry_str = stop_entry.strftime('%Y-%m-%dT%H:%M:%S%z')

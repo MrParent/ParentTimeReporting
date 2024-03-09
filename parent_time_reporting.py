@@ -158,7 +158,7 @@ toggl_entries_button.clicked.connect(get_toggl_entries)
 
 hbox_top_buttons.addWidget(toggl_entries_button, alignment=Qt.AlignLeft)
 
-optimize_button = QPushButton("Optimize")
+optimize_button = QPushButton("Get Optimize Entries")
 optimize_button.setFixedSize(200, 30)
 optimize_button.clicked.connect(get_optimize_entries)
 hbox_top_buttons.addWidget(optimize_button, alignment=Qt.AlignLeft)
