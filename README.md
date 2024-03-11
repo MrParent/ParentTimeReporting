@@ -50,7 +50,7 @@ This config.json file, that you have to have in the same folder as the program, 
   ]
 }
 ```
-If you use Optimize, you will have to write the description for a task in the form (toggl language): Client;Project;Description
+If you use Optimize, you will have to write the description for a task in the form: Client;Task;Description
 You also have to select the OptTimes.txt file that optimize generates when prompted for a file.
 
 Special thanks to Guppan for making this possible and for solving a lot of the issues regarding pushing time rows to Maconomy.
