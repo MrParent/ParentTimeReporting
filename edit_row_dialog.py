@@ -21,8 +21,8 @@ class EditRowDialog(QDialog):
         self.layout.addWidget(QLabel("Stop"))
         self.layout.addWidget(self.stop_field)
 
-        self.duration_field = QLineEdit(str(self.item.duration))
-        self.layout.addWidget(QLabel("Duration"))
+        self.duration_field = QLineEdit(str(self.item.get_duration_hours()))
+        self.layout.addWidget(QLabel("Duration (hours)"))
         self.layout.addWidget(self.duration_field)
 
         self.description_field = QLineEdit(self.item.description)
@@ -48,7 +48,7 @@ class EditRowDialog(QDialog):
     def save_changes(self):
         self.item.start = self.start_field.text()
         self.item.stop = self.stop_field.text()
-        self.item.duration = int(self.duration_field.text())
+        self.item.duration = int(float(self.duration_field.text()) * 3600)
         self.item.description = self.description_field.text()
         self.item.client_name = self.client_name_field.text()
         self.item.project_name = self.project_name_field.text()
