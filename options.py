@@ -23,7 +23,7 @@ class SettingsWindow(QDialog):
         self.layout = QVBoxLayout()
 
         #import the options from the config file
-        with open('options.json') as f:
+        with open('json/options.json') as f:
             options_json = json.load(f)
         self.company = options_json.get('company')
         self.maconomy_prod = options_json.get('maconomy_prod')
@@ -75,7 +75,7 @@ class SettingsWindow(QDialog):
         global maconomy_prod
         company = self.company_field.text().lower()
         maconomy_prod = self.maconomy_prod_field.text().lower()
-        with open('options.json', 'w') as f:
+        with open('json/options.json', 'w') as f:
             json.dump({'company': company, 'maconomy_prod': maconomy_prod}, f)
         self.close()
 
@@ -90,7 +90,7 @@ def showSettingsWindow():
 
 # Function to get the options from the config file.
 def getOptions():
-    with open('options.json') as f:
+    with open('json/options.json') as f:
         options_json = json.load(f)
     company = options_json.get('company')
     maconomy_prod = options_json.get('maconomy_prod')
