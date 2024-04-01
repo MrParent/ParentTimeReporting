@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel, QLineEdit
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtCore import Qt
@@ -6,6 +6,7 @@ import requester
 import maconomy_row
 from logger_config import logger
 from collections import defaultdict
+import options
 
 # Create a QFont object for a monospace font.
 monospace_font = QFont("Courier")
@@ -51,6 +52,11 @@ class JiraPopupWindow(QDialog):
 
     # Confirm jira push. FIXME: Add progress functionality.
     def on_confirm_jira(self):
+        print("Check if Jira company is set")
+        if not options.company:
+            options.show_options_url_check_failed("Company is not set.")
+            return
+        
         print("Push to Jira started")
         # Handle confirm action here
         for index in range(self.listbox.count()):
@@ -113,9 +119,11 @@ class MaconomyPopupWindow(QDialog):
 
     # Confirm Maconomy push. FIXME: Add progress functionality.
     def on_confirm_maconomy(self):
+        print("Check if Maconomy prod is set")
+        if not options.maconomy_prod:
+            options.show_options_url_check_failed("Maconomy prod is not set.")
+            return
         MaconomyLoginWindow(self.listbox, self).exec_()
-        #else:
-            
 
     # Abort Maconomy push.
     def on_abort(self):

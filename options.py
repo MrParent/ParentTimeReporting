@@ -111,9 +111,9 @@ def getOptions():
 #     except requests.ConnectionError as e:
 #         return e
 
-# def show_options_url_check_failed(message_string):
-#     msg = QMessageBox()
-#     msg.setWindowTitle("Url checks failed")
-#     msg.setText(message_string + "Please check the options and try again.")
-#     msg.setIcon(QMessageBox.Information)
-#     msg.exec_()
+def show_options_url_check_failed(message_string):
+     msg = QMessageBox()
+     msg.setWindowTitle("Options Error")
+     msg.setText(message_string + "Please check the options and try again.")
+     msg.setIcon(QMessageBox.Information)
+     msg.exec_()
