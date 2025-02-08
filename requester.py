@@ -285,7 +285,9 @@ def make_maconomy_request_insert_row_merged(job_nr, task, description, spec3, du
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomy_row.cookie_jar)
     logger.info("Maconomy Insert Row Response = ")
     logger.info(response)
-    #print(response.json())
+    print(data)
+    print("Response code = ")
+    print(response.status_code)
     maconomy_row.concurrency_token = response.headers.get('Maconomy-Concurrency-Control')
     return response
 
