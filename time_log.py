@@ -10,6 +10,9 @@ class TimeLog :
         self.description = description
         self.client_name = client_name
         self.project_name = project_name
+
+    def copy(self):
+        return TimeLog(self.start, self.stop, self.duration, self.description, self.client_name, self.project_name)
     
     def __str__(self):
         return f"Time: {self.get_duration():<8} Desc: {self.description:<80} Client: {self.client_name:<12} Project: {self.project_name:<12}"

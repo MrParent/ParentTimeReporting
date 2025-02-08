@@ -3,3 +3,4 @@ config.json
 __pycache__/
 build/
 dist/
+json/options.json

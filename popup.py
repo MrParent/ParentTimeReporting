@@ -81,12 +81,13 @@ class JiraPopupWindow(QDialog):
 class MaconomyPopupWindow(QDialog):
     def __init__(self, entries, parent=None):
         super(MaconomyPopupWindow, self).__init__(parent)
-
         self.setWindowTitle("Push to Maconomy time sheet")
         
         self.layout = QVBoxLayout()
         self.listbox = QListWidget()
         last_date = None
+        errors = []
+        date_item = None
         for entry in entries:
             if entry.get_start_date() != last_date:
                 last_date = entry.get_start_date()
@@ -96,6 +97,10 @@ class MaconomyPopupWindow(QDialog):
                 self.listbox.addItem(date_item)
 
             maconomy_entry = maconomy_row.get_maconomy_configured_entry(maconomy_row.maconomy_config, entry)
+            if maconomy_entry.job_nr == "None":
+                errors.append(entry)
+                continue
+            
             entry_text = maconomy_entry.short_str()
             item = QListWidgetItem(entry_text)
             item.setData(Qt.UserRole, maconomy_entry)
@@ -103,6 +108,13 @@ class MaconomyPopupWindow(QDialog):
             item.setCheckState(Qt.CheckState.Checked)
             item.setFont(monospace_font)
             self.listbox.addItem(item)
+        
+        if errors:
+            print("Please update the config file for the following rows:")
+            logger.info("Please update the config file for the following rows:")
+        for error in errors:
+            print("Error: " + error.short_str())
+            logger.info("Error: " + error.short_str())
 
         self.confirm_button = QPushButton("Confirm")
         self.confirm_button.clicked.connect(self.on_confirm_maconomy)
@@ -207,8 +219,6 @@ class MaconomyLoginWindow(QDialog):
         combined_entries = []
         for key, entries in entries_dict.items():
             combined_entries.append(self.combine_entries(entries))
-
-        #print(combined_entries)
 
         for job_nr, task, description, spec3, durations in combined_entries:
             if not update_card:

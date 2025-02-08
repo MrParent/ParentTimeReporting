@@ -43,7 +43,7 @@ def push_selected_items_maconomy():
     time_entries_to_push = []
 
     for item in checked_items:
-        time_entry = item.data(Qt.UserRole)
+        time_entry = item.data(Qt.UserRole).copy()
         if time_log.is_valid_maconomy_entry(time_entry):
             time_entries_to_push.append(time_entry)
 
