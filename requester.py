@@ -88,7 +88,7 @@ def make_jira_request(ticket, duration, start_time):
 # The maconomy login request function.
 def make_maconomy_login_request(username, password):
     basic_header = b64encode(f"{username}:{password}".encode()).decode()
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/auth/{options.maconomy_prod}"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/auth/{options.maconomy_prod}"
 
     payload = {}
     headers = {
@@ -108,7 +108,7 @@ def make_maconomy_login_request(username, password):
 
 # The maconomy request function to get the employee number.
 def make_maconomy_request_get_employee_number():
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/environment/{options.maconomy_prod}?variables=user.info.employeenumber"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/environment/{options.maconomy_prod}?variables=user.info.employeenumber"
     payload = {}
     headers = {
     'Maconomy-Authentication': 'X-Disable-Negotiate,X-Force-Maconomy-Credentials,X-Force-Maconomy-Credentials,X-Basic,X-Reconnect,X-Cookie',
@@ -128,7 +128,7 @@ def make_maconomy_request_get_employee_number():
 
 # The maconomy request function to create and get the instance id.
 def make_maconomy_request_instance():
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances"
     
     with open('json/instance_setup.json') as f:
         payload = json.load(f)
@@ -156,7 +156,7 @@ def make_maconomy_request_instance():
 
 # The maconomy request function to call the instance data once (initialize?).
 def make_maconomy_request_instance_data():
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data;any"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data;any"
     
     payload = {}
     
@@ -169,7 +169,7 @@ def make_maconomy_request_instance_data():
     'Connection': 'keep-alive',
     'Maconomy-Concurrency-Control': f'{maconomy_row.concurrency_token}',
     'Content-Length': '0',
-    'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
+    'Host': f'{options.maconomy_prod}-maconomy.deltekfirst.com'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomy_row.cookie_jar)
@@ -182,7 +182,7 @@ def make_maconomy_request_instance_data():
 
 # The maconomy request function to update the card to the right week.
 def make_maconomy_request_update_card(entry):
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/card/0"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/card/0"
     data = {
         "data": {
             "datevar": f"{entry.date}"
@@ -201,7 +201,7 @@ def make_maconomy_request_update_card(entry):
     'Maconomy-Concurrency-Control': f'{maconomy_row.concurrency_token}',
     'Content-Type': 'application/vnd.deltek.maconomy.containers+json; version=5.0',
     'Content-Length': f'{content_length}',
-    'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
+    'Host': f'{options.maconomy_prod}-maconomy.deltekfirst.com'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomy_row.cookie_jar)
@@ -213,7 +213,7 @@ def make_maconomy_request_update_card(entry):
 
 # The maconomy request function to insert a row in the timesheet.
 def make_maconomy_request_insert_row(entry):
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/table?row=end"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/table?row=end"
 
     day_of_week = entry.get_weekday() + 1
     data = {
@@ -239,8 +239,8 @@ def make_maconomy_request_insert_row(entry):
     'Connection': 'keep-alive',
     'Maconomy-Concurrency-Control': f'{maconomy_row.concurrency_token}',
     'Content-Length': f'{content_length}',
-    'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com',
-    'Referer': f'https://{options.maconomy_prod}-webclient.deltekfirst.com/workspace/weeklytimesheets;date={entry.date};employeenumber={maconomy_row.employee_number}'
+    'Host': f'{options.maconomy_prod}-maconomy.deltekfirst.com',
+    'Referer': f'https://{options.maconomy_prod}-maconomy.deltekfirst.com/workspace/weeklytimesheets;date={entry.date};employeenumber={maconomy_row.employee_number}'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomy_row.cookie_jar)
@@ -252,7 +252,7 @@ def make_maconomy_request_insert_row(entry):
 
 # The maconomy request function to insert a merged row in the timesheet.
 def make_maconomy_request_insert_row_merged(job_nr, task, description, spec3, durations):
-    url = f"https://{options.maconomy_prod}-webclient.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/table?row=end"
+    url = f"https://{options.maconomy_prod}-maconomy.deltekfirst.com/maconomy-api/containers/{options.maconomy_prod}/timeregistration/instances/{maconomy_row.instance_id}/data/panes/table?row=end"
 
     data = {
         "data": {
@@ -279,7 +279,7 @@ def make_maconomy_request_insert_row_merged(job_nr, task, description, spec3, du
     'Connection': 'keep-alive',
     'Maconomy-Concurrency-Control': f'{maconomy_row.concurrency_token}',
     'Content-Length': f'{content_length}',
-    'Host': f'{options.maconomy_prod}-webclient.deltekfirst.com'
+    'Host': f'{options.maconomy_prod}-maconomy.deltekfirst.com'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload, cookies=maconomy_row.cookie_jar)
